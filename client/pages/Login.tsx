@@ -55,8 +55,8 @@ export default function Login() {
 
       <div className="relative z-10 w-full max-w-md">
         {/* Logo/Branding */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 mb-4">
+        <div className="text-center mb-8 animate-slideInFromLeft">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 mb-4 animate-glow">
             <span className="text-white font-bold text-lg">CS</span>
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">CS2 Analysis</h1>
@@ -64,7 +64,7 @@ export default function Login() {
         </div>
 
         {/* Login Card */}
-        <Card className="border-slate-800 bg-slate-900/50 backdrop-blur-xl shadow-2xl">
+        <Card className="border-slate-800 bg-slate-900/50 backdrop-blur-xl shadow-2xl animate-slideInFromRight">
           <CardHeader className="space-y-1">
             <CardTitle className="text-white text-2xl">Welcome back</CardTitle>
             <CardDescription className="text-slate-400">Enter your credentials to access the platform</CardDescription>
