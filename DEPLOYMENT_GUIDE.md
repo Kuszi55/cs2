@@ -1,12 +1,14 @@
 # CS2 Demo Analysis Platform - VPS Deployment Guide
 
 This guide covers deploying the CS2 Demo Analysis application on your VPS with the following specifications:
+
 - **IPv4**: 146.59.126.207
 - **IPv6**: 2001:41d0:601:1100::66e9
 - **Storage**: 75GB
 - **OS**: Ubuntu 20.04 LTS (recommended)
 
 ## Prerequisites
+
 Before starting, ensure you have SSH access to your VPS and admin/root privileges.
 
 ---
@@ -14,21 +16,25 @@ Before starting, ensure you have SSH access to your VPS and admin/root privilege
 ## Step 1: Initial Server Setup
 
 ### 1.1 Connect to your VPS
+
 ```bash
 ssh root@146.59.126.207
 ```
 
 ### 1.2 Update system packages
+
 ```bash
 apt update && apt upgrade -y
 ```
 
 ### 1.3 Install essential tools
+
 ```bash
 apt install -y curl wget git build-essential htop net-tools
 ```
 
 ### 1.4 Configure firewall (UFW)
+
 ```bash
 ufw enable
 ufw allow 22/tcp     # SSH
@@ -42,18 +48,21 @@ ufw status
 ## Step 2: Install Node.js and npm
 
 ### 2.1 Install Node.js 20 LTS (recommended for this project)
+
 ```bash
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 apt install -y nodejs
 ```
 
 ### 2.2 Install pnpm (package manager used by this project)
+
 ```bash
 npm install -g pnpm
 pnpm --version
 ```
 
 ### 2.3 Verify installations
+
 ```bash
 node --version
 npm --version
@@ -65,32 +74,39 @@ pnpm --version
 ## Step 3: Set Up Application Directory
 
 ### 3.1 Create application directory
+
 ```bash
 mkdir -p /var/www/cs2-analysis
 cd /var/www/cs2-analysis
 ```
 
 ### 3.2 Clone or upload your project
+
 **Option A: Clone from Git (if using Git)**
+
 ```bash
 git clone https://your-repo-url.git .
 ```
 
 **Option B: Upload files manually**
+
 - Use SCP or SFTP to upload your project files to `/var/www/cs2-analysis`
 
 ### 3.3 Install dependencies
+
 ```bash
 cd /var/www/cs2-analysis
 pnpm install
 ```
 
 ### 3.4 Build the application
+
 ```bash
 pnpm build
 ```
 
 This creates two directories:
+
 - `dist/spa` - Frontend (React) build
 - `dist/server` - Backend (Express) build
 
@@ -101,45 +117,51 @@ This creates two directories:
 PM2 keeps your application running and automatically restarts it if it crashes.
 
 ### 4.1 Install PM2 globally
+
 ```bash
 npm install -g pm2
 ```
 
 ### 4.2 Create PM2 ecosystem configuration
+
 Create `/var/www/cs2-analysis/ecosystem.config.js`:
+
 ```javascript
 module.exports = {
   apps: [
     {
-      name: 'cs2-analysis',
-      script: './dist/server/node-build.mjs',
-      instances: 'max',
-      exec_mode: 'cluster',
+      name: "cs2-analysis",
+      script: "./dist/server/node-build.mjs",
+      instances: "max",
+      exec_mode: "cluster",
       env: {
-        NODE_ENV: 'production',
-        PORT: 3000
+        NODE_ENV: "production",
+        PORT: 3000,
       },
-      error_file: '/var/log/cs2-analysis-error.log',
-      out_file: '/var/log/cs2-analysis-out.log',
-      log_date_format: 'YYYY-MM-DD HH:mm:ss Z'
-    }
-  ]
+      error_file: "/var/log/cs2-analysis-error.log",
+      out_file: "/var/log/cs2-analysis-out.log",
+      log_date_format: "YYYY-MM-DD HH:mm:ss Z",
+    },
+  ],
 };
 ```
 
 ### 4.3 Start the application with PM2
+
 ```bash
 cd /var/www/cs2-analysis
 pm2 start ecosystem.config.js
 ```
 
 ### 4.4 Set PM2 to start on system boot
+
 ```bash
 pm2 startup
 pm2 save
 ```
 
 ### 4.5 Monitor the application
+
 ```bash
 pm2 logs cs2-analysis
 pm2 status
@@ -152,12 +174,15 @@ pm2 status
 Nginx will handle HTTP/HTTPS traffic and forward requests to your Node.js application.
 
 ### 5.1 Install Nginx
+
 ```bash
 apt install -y nginx
 ```
 
 ### 5.2 Create Nginx configuration
+
 Create `/etc/nginx/sites-available/cs2-analysis`:
+
 ```nginx
 server {
     listen 80;
@@ -200,7 +225,7 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_cache_bypass $http_upgrade;
-        
+
         # Timeouts for file upload
         proxy_connect_timeout 300s;
         proxy_send_timeout 300s;
@@ -216,6 +241,7 @@ server {
 ```
 
 ### 5.3 Enable the site
+
 ```bash
 ln -s /etc/nginx/sites-available/cs2-analysis /etc/nginx/sites-enabled/
 nginx -t  # Test configuration
@@ -227,17 +253,21 @@ systemctl restart nginx
 ## Step 6: Set Up SSL with Let's Encrypt
 
 ### 6.1 Install Certbot
+
 ```bash
 apt install -y certbot python3-certbot-nginx
 ```
 
 ### 6.2 Obtain SSL certificate
+
 Replace `your-domain.com` with your actual domain:
+
 ```bash
 certbot certonly --nginx -d your-domain.com -d www.your-domain.com
 ```
 
 ### 6.3 Set up automatic renewal
+
 ```bash
 systemctl enable certbot.timer
 systemctl start certbot.timer
@@ -249,12 +279,14 @@ certbot renew --dry-run  # Test renewal
 ## Step 7: Configure Environment Variables
 
 Create `/var/www/cs2-analysis/.env.production`:
+
 ```bash
 NODE_ENV=production
 PORT=3000
 ```
 
 Load environment variables before starting the app:
+
 ```bash
 cd /var/www/cs2-analysis
 source .env.production
@@ -266,6 +298,7 @@ pm2 restart ecosystem.config.js
 ## Step 8: Set Up Log Rotation
 
 Create `/etc/logrotate.d/cs2-analysis`:
+
 ```
 /var/log/cs2-analysis-*.log {
     daily
@@ -283,7 +316,9 @@ Create `/etc/logrotate.d/cs2-analysis`:
 ## Step 9: Domain Configuration
 
 ### 9.1 Point your domain to the VPS
+
 Update your domain's DNS records:
+
 - **A Record**: `your-domain.com` → `146.59.126.207`
 - **AAAA Record**: `your-domain.com` → `2001:41d0:601:1100::66e9`
 - **A Record**: `www.your-domain.com` → `146.59.126.207`
@@ -292,6 +327,7 @@ Update your domain's DNS records:
 Wait 24-48 hours for DNS propagation.
 
 ### 9.2 Verify DNS
+
 ```bash
 nslookup your-domain.com
 ```
@@ -303,27 +339,32 @@ nslookup your-domain.com
 When you need to update the application:
 
 ### 10.1 Pull latest changes
+
 ```bash
 cd /var/www/cs2-analysis
 git pull origin main  # if using git
 ```
 
 ### 10.2 Install dependencies
+
 ```bash
 pnpm install
 ```
 
 ### 10.3 Build the application
+
 ```bash
 pnpm build
 ```
 
 ### 10.4 Restart the application
+
 ```bash
 pm2 restart cs2-analysis
 ```
 
 ### 10.5 Check status
+
 ```bash
 pm2 logs cs2-analysis
 pm2 status
@@ -334,6 +375,7 @@ pm2 status
 ## Step 11: Monitoring and Maintenance
 
 ### 11.1 Monitor system resources
+
 ```bash
 htop
 df -h  # Disk usage
@@ -341,17 +383,20 @@ free -h  # Memory usage
 ```
 
 ### 11.2 View application logs
+
 ```bash
 pm2 logs cs2-analysis
 pm2 logs cs2-analysis --tail 100  # Last 100 lines
 ```
 
 ### 11.3 Monitor application performance
+
 ```bash
 pm2 monit
 ```
 
 ### 11.4 Check Nginx status
+
 ```bash
 systemctl status nginx
 journalctl -u nginx -f  # Real-time logs
@@ -362,12 +407,15 @@ journalctl -u nginx -f  # Real-time logs
 ## Step 12: Backup Strategy
 
 ### 12.1 Create backup directory
+
 ```bash
 mkdir -p /backups/cs2-analysis
 ```
 
 ### 12.2 Create backup script
+
 Create `/usr/local/bin/backup-cs2.sh`:
+
 ```bash
 #!/bin/bash
 DATE=$(date +%Y%m%d_%H%M%S)
@@ -378,11 +426,13 @@ find /backups/cs2-analysis -type f -mtime +30 -delete  # Keep last 30 days
 ```
 
 ### 12.3 Make script executable
+
 ```bash
 chmod +x /usr/local/bin/backup-cs2.sh
 ```
 
 ### 12.4 Set up cron job (daily backups at 2 AM)
+
 ```bash
 crontab -e
 # Add: 0 2 * * * /usr/local/bin/backup-cs2.sh
@@ -393,6 +443,7 @@ crontab -e
 ## Troubleshooting
 
 ### Application won't start
+
 ```bash
 pm2 logs cs2-analysis
 pm2 delete cs2-analysis
@@ -401,12 +452,14 @@ pm2 start ecosystem.config.js
 ```
 
 ### Port already in use
+
 ```bash
 lsof -i :3000
 kill -9 <PID>
 ```
 
 ### Nginx 502 Bad Gateway
+
 ```bash
 # Check if Node.js is running
 pm2 status
@@ -416,11 +469,13 @@ tail -f /var/log/nginx/error.log
 ```
 
 ### SSL certificate issues
+
 ```bash
 certbot renew --force-renewal
 ```
 
 ### High memory usage
+
 ```bash
 pm2 restart cs2-analysis
 # Or increase swap space if needed
@@ -431,6 +486,7 @@ pm2 restart cs2-analysis
 ## Security Recommendations
 
 1. **Keep system updated**
+
    ```bash
    apt update && apt upgrade -y
    ```
@@ -439,11 +495,13 @@ pm2 restart cs2-analysis
    Edit `/etc/ssh/sshd_config`: Set `PermitRootLogin no`
 
 3. **Use SSH keys instead of passwords**
+
    ```bash
    ssh-copy-id -i ~/.ssh/id_rsa.pub user@146.59.126.207
    ```
 
 4. **Install and configure Fail2ban**
+
    ```bash
    apt install -y fail2ban
    systemctl enable fail2ban

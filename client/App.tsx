@@ -30,10 +30,19 @@ const RootRoute = () => {
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<RootRoute />} />
-    <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
-    <Route path="/match-stats" element={<ProtectedRoute element={<MatchStats />} />} />
+    <Route
+      path="/dashboard"
+      element={<ProtectedRoute element={<Dashboard />} />}
+    />
+    <Route
+      path="/match-stats"
+      element={<ProtectedRoute element={<MatchStats />} />}
+    />
     <Route path="/clips" element={<ProtectedRoute element={<Clips />} />} />
-    <Route path="/settings" element={<ProtectedRoute element={<Settings />} />} />
+    <Route
+      path="/settings"
+      element={<ProtectedRoute element={<Settings />} />}
+    />
     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
     <Route path="*" element={<NotFound />} />
   </Routes>

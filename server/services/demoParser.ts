@@ -87,7 +87,7 @@ export class DemoAnalyzer {
 
       const mockAnalysis = this.generateMockAnalysis(basicInfo, gameMode);
       const fraudAssessments = mockAnalysis.players.map((player) =>
-        this.assessFraud(player)
+        this.assessFraud(player),
       );
 
       return {
@@ -96,7 +96,9 @@ export class DemoAnalyzer {
       };
     } catch (error) {
       console.error("Demo analysis error:", error);
-      throw new Error("Failed to analyze demo file: " + (error as Error).message);
+      throw new Error(
+        "Failed to analyze demo file: " + (error as Error).message,
+      );
     }
   }
 
@@ -119,7 +121,7 @@ export class DemoAnalyzer {
    * 5v5 (10 players), Wingman (4 players), DM (varying)
    */
   private detectGameMode(
-    info: any
+    info: any,
   ): "5v5" | "wingman" | "deathmatch" | "community" | "other" {
     const playerCount = Math.random() * 10; // Mock detection
 
@@ -134,7 +136,14 @@ export class DemoAnalyzer {
    * In production, this would parse binary dem format
    */
   private generateMockAnalysis(basicInfo: any, gameMode: string) {
-    const maps = ["Mirage", "Inferno", "Ancient", "Nuke", "Overpass", "Vertigo"];
+    const maps = [
+      "Mirage",
+      "Inferno",
+      "Ancient",
+      "Nuke",
+      "Overpass",
+      "Vertigo",
+    ];
     const mapName = maps[Math.floor(Math.random() * maps.length)];
 
     const playerCount =
@@ -168,7 +177,12 @@ export class DemoAnalyzer {
 
     return {
       mapName,
-      gameMode: gameMode as "5v5" | "wingman" | "deathmatch" | "community" | "other",
+      gameMode: gameMode as
+        | "5v5"
+        | "wingman"
+        | "deathmatch"
+        | "community"
+        | "other",
       teamAName: "Team A",
       teamBName: "Team B",
       teamAScore: Math.floor(Math.random() * 16),
@@ -198,7 +212,7 @@ export class DemoAnalyzer {
       reactionScore,
       gameSenseScore,
       consistencyScore,
-      suspiciousActivities.length
+      suspiciousActivities.length,
     );
 
     let riskLevel: "low" | "medium" | "high" | "critical" = "low";
@@ -286,7 +300,7 @@ export class DemoAnalyzer {
    * Detect specific suspicious patterns
    */
   private detectSuspiciousPatterns(
-    player: PlayerAnalysis
+    player: PlayerAnalysis,
   ): SuspiciousActivity[] {
     const activities: SuspiciousActivity[] = [];
 
@@ -338,7 +352,7 @@ export class DemoAnalyzer {
     reactionScore: number,
     gameSenseScore: number,
     consistencyScore: number,
-    suspiciousActivityCount: number
+    suspiciousActivityCount: number,
   ): number {
     const weights = {
       aim: 0.35,

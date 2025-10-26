@@ -1,6 +1,14 @@
 import { useState } from "react";
 import { ReactNode } from "react";
-import { BarChart3, Video, Settings, LogOut, Menu, X, TrendingUp } from "lucide-react";
+import {
+  BarChart3,
+  Video,
+  Settings,
+  LogOut,
+  Menu,
+  X,
+  TrendingUp,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -39,7 +47,11 @@ export function Layout({ children, onLogout }: LayoutProps) {
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="text-slate-400 hover:text-white transition-colors"
         >
-          {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          {sidebarOpen ? (
+            <X className="w-5 h-5" />
+          ) : (
+            <Menu className="w-5 h-5" />
+          )}
         </button>
       </div>
 
@@ -58,7 +70,9 @@ export function Layout({ children, onLogout }: LayoutProps) {
               </div>
               <div>
                 <h1 className="font-bold text-white">CS2 Analysis</h1>
-                <p className="text-xs text-slate-400">Professional Demo Analyzer</p>
+                <p className="text-xs text-slate-400">
+                  Professional Demo Analyzer
+                </p>
               </div>
             </div>
           </div>
@@ -98,9 +112,7 @@ export function Layout({ children, onLogout }: LayoutProps) {
 
         {/* Main Content */}
         <div className="flex-1 min-h-screen overflow-auto">
-          <div className="p-6 md:p-8 max-w-7xl">
-            {children}
-          </div>
+          <div className="p-6 md:p-8 max-w-7xl">{children}</div>
         </div>
       </div>
 

@@ -3,12 +3,14 @@
 ## Jak użyć:
 
 1. Połącz się z MySQL:
+
 ```bash
 mysql -h 193.111.250.106 -u u7446_mA85o7u3lr -p
 # Wpisz hasło: f9bsHnJ6vj@7vl^@7ctG.emh
 ```
 
 2. Wpisz komendę:
+
 ```sql
 USE s7446_ZENIT;
 ```
@@ -38,6 +40,7 @@ mysql -h 193.111.250.106 -u u7446_mA85o7u3lr -p s7446_ZENIT -e "SHOW TABLES;"
 ```
 
 Powinieneś zobaczyć następujące tabele:
+
 - analysis_logs
 - clips
 - fraud_assessment
@@ -61,6 +64,7 @@ Powinieneś zobaczyć następujące tabele:
 ## Notatka o zawartości DATABASE_SETUP.sql:
 
 Plik zawiera:
+
 - ✅ Tabelę `matches` (informacje o meczach)
 - ✅ Tabelę `players` (gracze w meczach)
 - ✅ Tabelę `player_stats` (statystyki graczy)

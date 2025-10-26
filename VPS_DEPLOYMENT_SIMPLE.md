@@ -110,7 +110,7 @@ server {
 server {
     listen 443 ssl http2;
     server_name twoja-domena.com www.twoja-domena.com;
-    
+
     client_max_body_size 500M;
 
     location / {
@@ -205,12 +205,14 @@ lsof -i :3000
 ## TROUBLESHOOTING
 
 ### "Connection refused on port 3000"
+
 ```bash
 pm2 restart cs2-analysis
 pm2 logs cs2-analysis
 ```
 
 ### "502 Bad Gateway w przeglądarce"
+
 ```bash
 # Sprawdź czy Node.js działa:
 pm2 status
@@ -220,13 +222,16 @@ systemctl restart nginx
 ```
 
 ### "Błąd przy wgrywaniu dema"
+
 - Sprawdź uprawnienia `/var/www/cs2-analysis/dist/spa/uploads`:
+
 ```bash
 mkdir -p /var/www/cs2-analysis/dist/spa/uploads
 chmod 755 /var/www/cs2-analysis/dist/spa/uploads
 ```
 
 ### "Błąd połączenia z bazą"
+
 ```bash
 # Test połączenia:
 mysql -h 193.111.250.106 -u u7446_mA85o7u3lr -p s7446_ZENIT
@@ -277,6 +282,7 @@ tar -czf backup_app.tar.gz /var/www/cs2-analysis
 ✅ **GOTOWE!** Aplikacja powinna być dostępna na `https://twoja-domena.com`
 
 Jeśli coś nie działa, sprawdź logi:
+
 ```bash
 pm2 logs cs2-analysis
 tail -f /var/log/nginx/error.log

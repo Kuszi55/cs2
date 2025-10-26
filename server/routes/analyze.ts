@@ -3,7 +3,11 @@ import multer from "multer";
 import * as path from "path";
 import * as fs from "fs";
 import * as crypto from "crypto";
-import { DemoAnalyzer, isValidDemoFile, getDemoFileMetadata } from "../services/demoParser";
+import {
+  DemoAnalyzer,
+  isValidDemoFile,
+  getDemoFileMetadata,
+} from "../services/demoParser";
 
 const router = Router();
 
@@ -28,10 +32,7 @@ const upload = multer({
   fileFilter: (req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
     if (ext !== ".dem") {
-      return cb(
-        new Error("Only .dem files are supported"),
-        false
-      );
+      return cb(new Error("Only .dem files are supported"), false);
     }
     cb(null, true);
   },

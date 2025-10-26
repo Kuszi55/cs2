@@ -2,7 +2,13 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 import { playSound } from "@/lib/sounds";
 
@@ -19,7 +25,7 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      playSound('click');
+      playSound("click");
     } catch (e) {
       // Sound might not be available in all browsers
     }
@@ -30,13 +36,13 @@ export default function Login() {
     if (!success) {
       setError("Invalid credentials. Please try again.");
       try {
-        playSound('error');
+        playSound("error");
       } catch (e) {
         // Sound might not be available in all browsers
       }
     } else {
       try {
-        playSound('success');
+        playSound("success");
       } catch (e) {
         // Sound might not be available in all browsers
       }
@@ -50,7 +56,10 @@ export default function Login() {
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }}></div>
+        <div
+          className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "1s" }}
+        ></div>
       </div>
 
       <div className="relative z-10 w-full max-w-md">
@@ -67,7 +76,9 @@ export default function Login() {
         <Card className="border-slate-800 bg-slate-900/50 backdrop-blur-xl shadow-2xl animate-slideInFromRight">
           <CardHeader className="space-y-1">
             <CardTitle className="text-white text-2xl">Welcome back</CardTitle>
-            <CardDescription className="text-slate-400">Enter your credentials to access the platform</CardDescription>
+            <CardDescription className="text-slate-400">
+              Enter your credentials to access the platform
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -79,7 +90,9 @@ export default function Login() {
               )}
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-200">Username</label>
+                <label className="text-sm font-medium text-slate-200">
+                  Username
+                </label>
                 <Input
                   type="text"
                   placeholder="Enter your username"
@@ -91,7 +104,9 @@ export default function Login() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-200">Password</label>
+                <label className="text-sm font-medium text-slate-200">
+                  Password
+                </label>
                 <Input
                   type="password"
                   placeholder="Enter your password"
@@ -122,7 +137,8 @@ export default function Login() {
 
         {/* Footer note */}
         <p className="text-center text-xs text-slate-500 mt-6">
-          This is a secure admin-only platform for professional CS2 demo analysis
+          This is a secure admin-only platform for professional CS2 demo
+          analysis
         </p>
       </div>
     </div>

@@ -158,7 +158,8 @@
   }
 
   @keyframes glow {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 0.5;
     }
     50% {
@@ -201,7 +202,10 @@
   }
 
   /* Smooth transitions for interactive elements */
-  button, input, textarea, select {
+  button,
+  input,
+  textarea,
+  select {
     @apply transition-all duration-200;
   }
 

@@ -10,7 +10,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(
-    () => localStorage.getItem("cs2_auth") === "true"
+    () => localStorage.getItem("cs2_auth") === "true",
   );
 
   const login = (username: string, password: string): boolean => {

@@ -3,7 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Upload,
   BarChart3,
@@ -64,7 +70,9 @@ export default function Dashboard() {
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(
+    null,
+  );
   const [gameMode, setGameMode] = useState<string>("");
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -155,9 +163,11 @@ export default function Dashboard() {
     }
   };
 
-  const selectedPlayerData = analysisResult?.players.find((p) => p.name === selectedPlayer);
+  const selectedPlayerData = analysisResult?.players.find(
+    (p) => p.name === selectedPlayer,
+  );
   const selectedPlayerFraud = analysisResult?.fraudAssessments.find(
-    (f) => f.playerName === selectedPlayer
+    (f) => f.playerName === selectedPlayer,
   );
 
   return (
@@ -166,7 +176,9 @@ export default function Dashboard() {
         {/* Header */}
         <div className="border-b border-slate-700 pb-6">
           <h1 className="text-4xl font-bold text-white mb-2">Demo Analysis</h1>
-          <p className="text-slate-400">Upload CS2 demo files for advanced cheating detection and analysis</p>
+          <p className="text-slate-400">
+            Upload CS2 demo files for advanced cheating detection and analysis
+          </p>
         </div>
 
         {/* Tabs */}
@@ -205,7 +217,9 @@ export default function Dashboard() {
                   <Upload className="w-5 h-5 text-blue-400" />
                   Upload Demo File
                 </CardTitle>
-                <CardDescription>Supported formats: .dem (Counter-Strike 2 demo files)</CardDescription>
+                <CardDescription>
+                  Supported formats: .dem (Counter-Strike 2 demo files)
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="border-2 border-dashed border-slate-700 rounded-lg p-12 text-center hover:border-blue-500 transition-colors cursor-pointer group">
@@ -221,14 +235,22 @@ export default function Dashboard() {
                     {isAnalyzing ? (
                       <>
                         <Loader2 className="w-12 h-12 text-blue-400 mx-auto mb-3 animate-spin" />
-                        <p className="text-white font-medium mb-1">Analyzing demo...</p>
-                        <p className="text-slate-400 text-sm">{Math.round(uploadProgress)}% complete</p>
+                        <p className="text-white font-medium mb-1">
+                          Analyzing demo...
+                        </p>
+                        <p className="text-slate-400 text-sm">
+                          {Math.round(uploadProgress)}% complete
+                        </p>
                       </>
                     ) : (
                       <>
                         <Upload className="w-12 h-12 text-slate-600 group-hover:text-blue-400 mx-auto mb-3 transition-colors" />
-                        <p className="text-white font-medium mb-1">Drop your demo file here</p>
-                        <p className="text-slate-400 text-sm">or click to browse</p>
+                        <p className="text-white font-medium mb-1">
+                          Drop your demo file here
+                        </p>
+                        <p className="text-slate-400 text-sm">
+                          or click to browse
+                        </p>
                       </>
                     )}
                   </label>
@@ -261,11 +283,15 @@ export default function Dashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="p-3 bg-slate-800/50 rounded-lg">
                     <p className="text-slate-400 text-sm mb-1">Map</p>
-                    <p className="text-white font-semibold">{analysisResult.mapName}</p>
+                    <p className="text-white font-semibold">
+                      {analysisResult.mapName}
+                    </p>
                   </div>
                   <div className="p-3 bg-slate-800/50 rounded-lg">
                     <p className="text-slate-400 text-sm mb-1">Game Mode</p>
-                    <p className="text-white font-semibold uppercase">{analysisResult.gameMode}</p>
+                    <p className="text-white font-semibold uppercase">
+                      {analysisResult.gameMode}
+                    </p>
                   </div>
                   <div className="p-3 bg-slate-800/50 rounded-lg">
                     <p className="text-slate-400 text-sm mb-1">Score</p>
@@ -275,7 +301,9 @@ export default function Dashboard() {
                   </div>
                   <div className="p-3 bg-slate-800/50 rounded-lg">
                     <p className="text-slate-400 text-sm mb-1">Players</p>
-                    <p className="text-white font-semibold">{analysisResult.players.length} players</p>
+                    <p className="text-white font-semibold">
+                      {analysisResult.players.length} players
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -289,13 +317,16 @@ export default function Dashboard() {
                     <BarChart3 className="w-5 h-5 text-blue-400" />
                     Select Player to Analyze
                   </CardTitle>
-                  <CardDescription>Choose a player to view detailed statistics and fraud assessment</CardDescription>
+                  <CardDescription>
+                    Choose a player to view detailed statistics and fraud
+                    assessment
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
                     {analysisResult.players.map((player) => {
                       const fraud = analysisResult.fraudAssessments.find(
-                        (f) => f.playerName === player.name
+                        (f) => f.playerName === player.name,
                       );
                       return (
                         <button
@@ -303,10 +334,23 @@ export default function Dashboard() {
                           onClick={() => setSelectedPlayer(player.name)}
                           className="p-4 rounded-lg text-left transition-all bg-slate-800/50 border border-slate-700 hover:border-slate-600 hover:bg-slate-800/70"
                         >
-                          <p className="font-medium text-white text-sm">{player.name}</p>
-                          <p className="text-slate-400 text-xs mt-1">K/D: {player.kdRatio.toFixed(2)}</p>
+                          <p className="font-medium text-white text-sm">
+                            {player.name}
+                          </p>
                           <p className="text-slate-400 text-xs mt-1">
-                            Fraud: <span className={fraud?.fraudProbability! > 50 ? "text-red-400" : "text-green-400"}>{fraud?.fraudProbability?.toFixed(0)}%</span>
+                            K/D: {player.kdRatio.toFixed(2)}
+                          </p>
+                          <p className="text-slate-400 text-xs mt-1">
+                            Fraud:{" "}
+                            <span
+                              className={
+                                fraud?.fraudProbability! > 50
+                                  ? "text-red-400"
+                                  : "text-green-400"
+                              }
+                            >
+                              {fraud?.fraudProbability?.toFixed(0)}%
+                            </span>
                           </p>
                         </button>
                       );
@@ -327,7 +371,9 @@ export default function Dashboard() {
                 {/* Fraud Probability */}
                 <Card className="border-slate-700 bg-gradient-to-br from-slate-900/50 to-slate-800/50 backdrop-blur overflow-hidden">
                   <CardHeader>
-                    <CardTitle className="text-white text-lg">Fraud Assessment</CardTitle>
+                    <CardTitle className="text-white text-lg">
+                      Fraud Assessment
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-6">
@@ -336,13 +382,19 @@ export default function Dashboard() {
                           <span className="text-6xl font-bold gradient-text">
                             {selectedPlayerFraud.fraudProbability.toFixed(1)}
                           </span>
-                          <span className="text-2xl text-slate-400 mb-2">%</span>
+                          <span className="text-2xl text-slate-400 mb-2">
+                            %
+                          </span>
                         </div>
-                        <p className="text-slate-300 text-sm">Estimated fraud probability based on gameplay analysis</p>
+                        <p className="text-slate-300 text-sm">
+                          Estimated fraud probability based on gameplay analysis
+                        </p>
                       </div>
 
                       <div>
-                        <p className="text-slate-300 text-sm font-medium mb-3">Risk Level</p>
+                        <p className="text-slate-300 text-sm font-medium mb-3">
+                          Risk Level
+                        </p>
                         <div className="w-full bg-slate-800 rounded-full h-2">
                           <div
                             className={`h-2 rounded-full transition-all ${
@@ -352,7 +404,9 @@ export default function Dashboard() {
                                   ? "bg-yellow-500"
                                   : "bg-green-500"
                             }`}
-                            style={{ width: `${selectedPlayerFraud.fraudProbability}%` }}
+                            style={{
+                              width: `${selectedPlayerFraud.fraudProbability}%`,
+                            }}
                           ></div>
                         </div>
                         <div className="flex justify-between mt-2 text-xs text-slate-400">
@@ -366,19 +420,33 @@ export default function Dashboard() {
                       {/* Score Breakdown */}
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         <div className="bg-slate-800/50 rounded-lg p-3">
-                          <p className="text-slate-400 text-xs mb-1">Aim Score</p>
-                          <p className="text-white font-semibold">{selectedPlayerFraud.aimScore.toFixed(0)}%</p>
+                          <p className="text-slate-400 text-xs mb-1">
+                            Aim Score
+                          </p>
+                          <p className="text-white font-semibold">
+                            {selectedPlayerFraud.aimScore.toFixed(0)}%
+                          </p>
                         </div>
                         <div className="bg-slate-800/50 rounded-lg p-3">
-                          <p className="text-slate-400 text-xs mb-1">Positioning</p>
-                          <p className="text-white font-semibold">{selectedPlayerFraud.positioningScore.toFixed(0)}%</p>
+                          <p className="text-slate-400 text-xs mb-1">
+                            Positioning
+                          </p>
+                          <p className="text-white font-semibold">
+                            {selectedPlayerFraud.positioningScore.toFixed(0)}%
+                          </p>
                         </div>
                         <div className="bg-slate-800/50 rounded-lg p-3">
-                          <p className="text-slate-400 text-xs mb-1">Reaction Time</p>
-                          <p className="text-white font-semibold">{selectedPlayerFraud.reactionScore.toFixed(0)}%</p>
+                          <p className="text-slate-400 text-xs mb-1">
+                            Reaction Time
+                          </p>
+                          <p className="text-white font-semibold">
+                            {selectedPlayerFraud.reactionScore.toFixed(0)}%
+                          </p>
                         </div>
                         <div className="bg-slate-800/50 rounded-lg p-3">
-                          <p className="text-slate-400 text-xs mb-1">Risk Level</p>
+                          <p className="text-slate-400 text-xs mb-1">
+                            Risk Level
+                          </p>
                           <p
                             className={`font-semibold text-xs uppercase ${
                               selectedPlayerFraud.riskLevel === "critical"
@@ -402,45 +470,58 @@ export default function Dashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-slate-400 text-sm font-medium">K/D Ratio</CardTitle>
+                      <CardTitle className="text-slate-400 text-sm font-medium">
+                        K/D Ratio
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-3xl font-bold text-white">
                         {selectedPlayerData.kdRatio.toFixed(2)}
                       </div>
                       <p className="text-slate-400 text-sm mt-1">
-                        {selectedPlayerData.kills} Kills / {selectedPlayerData.deaths} Deaths
+                        {selectedPlayerData.kills} Kills /{" "}
+                        {selectedPlayerData.deaths} Deaths
                       </p>
                     </CardContent>
                   </Card>
 
                   <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-slate-400 text-sm font-medium">Accuracy</CardTitle>
+                      <CardTitle className="text-slate-400 text-sm font-medium">
+                        Accuracy
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-3xl font-bold text-white">
                         {(selectedPlayerData.accuracy * 100).toFixed(1)}%
                       </div>
-                      <p className="text-slate-400 text-sm mt-1">Overall shot accuracy</p>
+                      <p className="text-slate-400 text-sm mt-1">
+                        Overall shot accuracy
+                      </p>
                     </CardContent>
                   </Card>
 
                   <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-slate-400 text-sm font-medium">Headshot Rate</CardTitle>
+                      <CardTitle className="text-slate-400 text-sm font-medium">
+                        Headshot Rate
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-3xl font-bold text-white">
                         {selectedPlayerData.hsPercent.toFixed(1)}%
                       </div>
-                      <p className="text-slate-400 text-sm mt-1">{selectedPlayerData.headshots} headshots</p>
+                      <p className="text-slate-400 text-sm mt-1">
+                        {selectedPlayerData.headshots} headshots
+                      </p>
                     </CardContent>
                   </Card>
 
                   <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-slate-400 text-sm font-medium">Damage</CardTitle>
+                      <CardTitle className="text-slate-400 text-sm font-medium">
+                        Damage
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-3xl font-bold text-white">
@@ -454,25 +535,33 @@ export default function Dashboard() {
 
                   <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-slate-400 text-sm font-medium">Rating</CardTitle>
+                      <CardTitle className="text-slate-400 text-sm font-medium">
+                        Rating
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-3xl font-bold text-white">
                         {selectedPlayerData.rating.toFixed(2)}
                       </div>
-                      <p className="text-slate-400 text-sm mt-1">HLTV Performance Rating</p>
+                      <p className="text-slate-400 text-sm mt-1">
+                        HLTV Performance Rating
+                      </p>
                     </CardContent>
                   </Card>
 
                   <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-slate-400 text-sm font-medium">Assists</CardTitle>
+                      <CardTitle className="text-slate-400 text-sm font-medium">
+                        Assists
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-3xl font-bold text-white">
                         {selectedPlayerData.assists}
                       </div>
-                      <p className="text-slate-400 text-sm mt-1">Total assists</p>
+                      <p className="text-slate-400 text-sm mt-1">
+                        Total assists
+                      </p>
                     </CardContent>
                   </Card>
                 </div>
@@ -483,24 +572,32 @@ export default function Dashboard() {
                     <CardHeader>
                       <CardTitle className="text-red-400 flex items-center gap-2">
                         <AlertTriangle className="w-5 h-5" />
-                        Suspicious Indicators ({selectedPlayerFraud.suspiciousActivities.length})
+                        Suspicious Indicators (
+                        {selectedPlayerFraud.suspiciousActivities.length})
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
-                        {selectedPlayerFraud.suspiciousActivities.map((activity, idx) => (
-                          <div key={idx} className="p-3 bg-slate-900/50 rounded-lg border border-red-500/20">
-                            <div className="flex justify-between items-start gap-2 mb-1">
-                              <p className="text-white font-medium text-sm capitalize">
-                                {activity.type.replace(/_/g, " ")}
+                        {selectedPlayerFraud.suspiciousActivities.map(
+                          (activity, idx) => (
+                            <div
+                              key={idx}
+                              className="p-3 bg-slate-900/50 rounded-lg border border-red-500/20"
+                            >
+                              <div className="flex justify-between items-start gap-2 mb-1">
+                                <p className="text-white font-medium text-sm capitalize">
+                                  {activity.type.replace(/_/g, " ")}
+                                </p>
+                                <span className="text-red-400 text-sm font-semibold">
+                                  {activity.confidence.toFixed(0)}%
+                                </span>
+                              </div>
+                              <p className="text-red-200 text-xs">
+                                {activity.description}
                               </p>
-                              <span className="text-red-400 text-sm font-semibold">
-                                {activity.confidence.toFixed(0)}%
-                              </span>
                             </div>
-                            <p className="text-red-200 text-xs">{activity.description}</p>
-                          </div>
-                        ))}
+                          ),
+                        )}
                       </div>
                     </CardContent>
                   </Card>
