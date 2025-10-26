@@ -1,60 +1,164 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Upload, BarChart3, Zap, AlertTriangle } from "lucide-react";
+import {
+  Upload,
+  BarChart3,
+  AlertTriangle,
+  ArrowRight,
+  Loader2,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
-interface DemoFile {
-  name: string;
-  size: number;
-  uploadedAt: Date;
+interface AnalysisResult {
+  mapName: string;
+  gameMode: string;
+  teamAScore: number;
+  teamBScore: number;
+  players: PlayerAnalysis[];
+  fraudAssessments: FraudAssessment[];
 }
 
-interface PlayerStat {
+interface PlayerAnalysis {
   name: string;
+  team: string;
   kills: number;
   deaths: number;
+  assists: number;
+  accuracy: number;
   headshots: number;
+  hsPercent: number;
+  totalDamage: number;
+  avgDamage: number;
+  kdRatio: number;
   rating: number;
-  cheatProbability: number;
+}
+
+interface FraudAssessment {
+  playerName: string;
+  fraudProbability: number;
+  aimScore: number;
+  positioningScore: number;
+  reactionScore: number;
+  riskLevel: string;
+  suspiciousActivities: SuspiciousActivity[];
+}
+
+interface SuspiciousActivity {
+  type: string;
+  confidence: number;
+  description: string;
 }
 
 export default function Dashboard() {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
+
   const [activeTab, setActiveTab] = useState<"upload" | "analysis">("upload");
-  const [demoFile, setDemoFile] = useState<DemoFile | null>(null);
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const [gameMode, setGameMode] = useState<string>("");
 
-  // Mock data for demonstration
-  const mockPlayers: PlayerStat[] = [
-    { name: "PlayerOne", kills: 24, deaths: 8, headshots: 12, rating: 1.45, cheatProbability: 45 },
-    { name: "PlayerTwo", kills: 18, deaths: 12, headshots: 6, rating: 1.2, cheatProbability: 12 },
-    { name: "PlayerThree", kills: 20, deaths: 10, headshots: 10, rating: 1.35, cheatProbability: 8 },
-    { name: "PlayerFour", kills: 16, deaths: 14, headshots: 5, rating: 1.0, cheatProbability: 78 },
-    { name: "PlayerFive", kills: 22, deaths: 9, headshots: 11, rating: 1.4, cheatProbability: 22 },
-  ];
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setDemoFile({
-        name: file.name,
-        size: file.size,
-        uploadedAt: new Date(),
-      });
-      setIsAnalyzing(true);
-      setSelectedPlayer(null);
+    if (!file) return;
 
-      // Simulate analysis
-      setTimeout(() => {
+    if (!file.name.toLowerCase().endsWith(".dem")) {
+      toast({
+        title: "Invalid file format",
+        description: "Please upload a .dem file",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsAnalyzing(true);
+    setUploadProgress(0);
+    setSelectedPlayer(null);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const xhr = new XMLHttpRequest();
+
+      xhr.upload.addEventListener("progress", (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = (event.loaded / event.total) * 50;
+          setUploadProgress(percentComplete);
+        }
+      });
+
+      xhr.addEventListener("load", async () => {
+        if (xhr.status === 200) {
+          try {
+            setUploadProgress(75);
+            const response = JSON.parse(xhr.responseText);
+            const result: AnalysisResult = response.analysis;
+
+            setAnalysisResult(result);
+            setGameMode(result.gameMode);
+            setUploadProgress(100);
+            setActiveTab("analysis");
+
+            toast({
+              title: "Analysis complete!",
+              description: `Demo analyzed: ${result.mapName} (${result.gameMode})`,
+            });
+          } catch (error) {
+            console.error("Parse error:", error);
+            setIsAnalyzing(false);
+            toast({
+              title: "Error",
+              description: "Failed to parse analysis results",
+              variant: "destructive",
+            });
+          }
+        } else {
+          const errorResponse = JSON.parse(xhr.responseText);
+          setIsAnalyzing(false);
+          toast({
+            title: "Analysis failed",
+            description: errorResponse.error || "Failed to analyze demo",
+            variant: "destructive",
+          });
+        }
+      });
+
+      xhr.addEventListener("error", () => {
         setIsAnalyzing(false);
-        setActiveTab("analysis");
-      }, 2000);
+        toast({
+          title: "Upload failed",
+          description: "Network error during upload",
+          variant: "destructive",
+        });
+      });
+
+      xhr.open("POST", "/api/analyze/upload");
+      xhr.send(formData);
+    } catch (error) {
+      console.error("Upload error:", error);
+      setIsAnalyzing(false);
+      toast({
+        title: "Error",
+        description: "Failed to upload demo file",
+        variant: "destructive",
+      });
     }
   };
+
+  const selectedPlayerData = analysisResult?.players.find((p) => p.name === selectedPlayer);
+  const selectedPlayerFraud = analysisResult?.fraudAssessments.find(
+    (f) => f.playerName === selectedPlayer
+  );
 
   return (
     <Layout onLogout={logout}>
@@ -62,7 +166,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="border-b border-slate-700 pb-6">
           <h1 className="text-4xl font-bold text-white mb-2">Demo Analysis</h1>
-          <p className="text-slate-400">Upload and analyze Counter-Strike 2 demo files for suspicious activity</p>
+          <p className="text-slate-400">Upload CS2 demo files for advanced cheating detection and analysis</p>
         </div>
 
         {/* Tabs */}
@@ -79,11 +183,11 @@ export default function Dashboard() {
           </button>
           <button
             onClick={() => setActiveTab("analysis")}
-            disabled={!demoFile}
+            disabled={!analysisResult}
             className={`px-4 py-2 font-medium text-sm transition-colors ${
               activeTab === "analysis"
                 ? "text-blue-400 border-b-2 border-blue-400"
-                : demoFile
+                : analysisResult
                   ? "text-slate-400 hover:text-slate-300"
                   : "text-slate-600 cursor-not-allowed"
             }`}
@@ -109,202 +213,310 @@ export default function Dashboard() {
                     type="file"
                     accept=".dem"
                     onChange={handleFileUpload}
+                    disabled={isAnalyzing}
                     className="hidden"
                     id="demo-upload"
                   />
                   <label htmlFor="demo-upload" className="cursor-pointer block">
-                    <Upload className="w-12 h-12 text-slate-600 group-hover:text-blue-400 mx-auto mb-3 transition-colors" />
-                    <p className="text-white font-medium mb-1">Drop your demo file here</p>
-                    <p className="text-slate-400 text-sm">or click to browse</p>
+                    {isAnalyzing ? (
+                      <>
+                        <Loader2 className="w-12 h-12 text-blue-400 mx-auto mb-3 animate-spin" />
+                        <p className="text-white font-medium mb-1">Analyzing demo...</p>
+                        <p className="text-slate-400 text-sm">{Math.round(uploadProgress)}% complete</p>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-12 h-12 text-slate-600 group-hover:text-blue-400 mx-auto mb-3 transition-colors" />
+                        <p className="text-white font-medium mb-1">Drop your demo file here</p>
+                        <p className="text-slate-400 text-sm">or click to browse</p>
+                      </>
+                    )}
                   </label>
                 </div>
+
+                {isAnalyzing && (
+                  <div className="mt-4">
+                    <div className="w-full bg-slate-800 rounded-full h-2">
+                      <div
+                        className="h-2 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full transition-all duration-300"
+                        style={{ width: `${uploadProgress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
-
-            {demoFile && (
-              <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
-                <CardHeader>
-                  <CardTitle className="text-white text-sm">Uploaded File</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <p className="text-white font-medium">{demoFile.name}</p>
-                    <p className="text-slate-400 text-sm">{(demoFile.size / 1024 / 1024).toFixed(2)} MB</p>
-                    <p className="text-slate-400 text-sm">{demoFile.uploadedAt.toLocaleString()}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </div>
         )}
 
         {/* Analysis Tab */}
-        {activeTab === "analysis" && (
+        {activeTab === "analysis" && analysisResult && (
           <div className="space-y-4">
-            {isAnalyzing ? (
-              <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
-                <CardContent className="pt-6">
-                  <div className="text-center py-8">
-                    <div className="inline-block w-8 h-8 border-3 border-blue-400 border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <p className="text-white font-medium">Analyzing demo file...</p>
-                    <p className="text-slate-400 text-sm mt-2">This may take a moment</p>
+            {/* Match Info */}
+            <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
+              <CardHeader>
+                <CardTitle className="text-white">Match Information</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="p-3 bg-slate-800/50 rounded-lg">
+                    <p className="text-slate-400 text-sm mb-1">Map</p>
+                    <p className="text-white font-semibold">{analysisResult.mapName}</p>
                   </div>
-                </CardContent>
-              </Card>
-            ) : (
-              <>
-                {/* Player Selection */}
-                <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <BarChart3 className="w-5 h-5 text-blue-400" />
-                      Select Player to Analyze
-                    </CardTitle>
-                    <CardDescription>Choose a player to view detailed statistics and fraud probability</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {mockPlayers.map((player) => (
+                  <div className="p-3 bg-slate-800/50 rounded-lg">
+                    <p className="text-slate-400 text-sm mb-1">Game Mode</p>
+                    <p className="text-white font-semibold uppercase">{analysisResult.gameMode}</p>
+                  </div>
+                  <div className="p-3 bg-slate-800/50 rounded-lg">
+                    <p className="text-slate-400 text-sm mb-1">Score</p>
+                    <p className="text-white font-semibold">
+                      {analysisResult.teamAScore} - {analysisResult.teamBScore}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-slate-800/50 rounded-lg">
+                    <p className="text-slate-400 text-sm mb-1">Players</p>
+                    <p className="text-white font-semibold">{analysisResult.players.length} players</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Player Selection */}
+            {!selectedPlayer ? (
+              <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5 text-blue-400" />
+                    Select Player to Analyze
+                  </CardTitle>
+                  <CardDescription>Choose a player to view detailed statistics and fraud assessment</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+                    {analysisResult.players.map((player) => {
+                      const fraud = analysisResult.fraudAssessments.find(
+                        (f) => f.playerName === player.name
+                      );
+                      return (
                         <button
                           key={player.name}
                           onClick={() => setSelectedPlayer(player.name)}
-                          className={`p-4 rounded-lg text-left transition-all ${
-                            selectedPlayer === player.name
-                              ? "bg-blue-500/20 border-2 border-blue-500"
-                              : "bg-slate-800/50 border border-slate-700 hover:border-slate-600"
-                          }`}
+                          className="p-4 rounded-lg text-left transition-all bg-slate-800/50 border border-slate-700 hover:border-slate-600 hover:bg-slate-800/70"
                         >
-                          <p className="font-medium text-white">{player.name}</p>
-                          <p className="text-slate-400 text-sm mt-1">K/D: {player.kills}/{player.deaths}</p>
+                          <p className="font-medium text-white text-sm">{player.name}</p>
+                          <p className="text-slate-400 text-xs mt-1">K/D: {player.kdRatio.toFixed(2)}</p>
+                          <p className="text-slate-400 text-xs mt-1">
+                            Fraud: <span className={fraud?.fraudProbability! > 50 ? "text-red-400" : "text-green-400"}>{fraud?.fraudProbability?.toFixed(0)}%</span>
+                          </p>
                         </button>
-                      ))}
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            ) : selectedPlayerData && selectedPlayerFraud ? (
+              <div className="space-y-4 animate-fadeIn">
+                {/* Back Button */}
+                <button
+                  onClick={() => setSelectedPlayer(null)}
+                  className="text-slate-400 hover:text-slate-300 text-sm font-medium transition-colors mb-2"
+                >
+                  ← Back to player list
+                </button>
+
+                {/* Fraud Probability */}
+                <Card className="border-slate-700 bg-gradient-to-br from-slate-900/50 to-slate-800/50 backdrop-blur overflow-hidden">
+                  <CardHeader>
+                    <CardTitle className="text-white text-lg">Fraud Assessment</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-6">
+                      <div className="text-center py-6 bg-slate-900/50 rounded-lg">
+                        <div className="inline-flex items-end justify-center gap-1 mb-4">
+                          <span className="text-6xl font-bold gradient-text">
+                            {selectedPlayerFraud.fraudProbability.toFixed(1)}
+                          </span>
+                          <span className="text-2xl text-slate-400 mb-2">%</span>
+                        </div>
+                        <p className="text-slate-300 text-sm">Estimated fraud probability based on gameplay analysis</p>
+                      </div>
+
+                      <div>
+                        <p className="text-slate-300 text-sm font-medium mb-3">Risk Level</p>
+                        <div className="w-full bg-slate-800 rounded-full h-2">
+                          <div
+                            className={`h-2 rounded-full transition-all ${
+                              selectedPlayerFraud.fraudProbability > 60
+                                ? "bg-red-500"
+                                : selectedPlayerFraud.fraudProbability > 30
+                                  ? "bg-yellow-500"
+                                  : "bg-green-500"
+                            }`}
+                            style={{ width: `${selectedPlayerFraud.fraudProbability}%` }}
+                          ></div>
+                        </div>
+                        <div className="flex justify-between mt-2 text-xs text-slate-400">
+                          <span>Low</span>
+                          <span>Medium</span>
+                          <span>High</span>
+                          <span>Critical</span>
+                        </div>
+                      </div>
+
+                      {/* Score Breakdown */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div className="bg-slate-800/50 rounded-lg p-3">
+                          <p className="text-slate-400 text-xs mb-1">Aim Score</p>
+                          <p className="text-white font-semibold">{selectedPlayerFraud.aimScore.toFixed(0)}%</p>
+                        </div>
+                        <div className="bg-slate-800/50 rounded-lg p-3">
+                          <p className="text-slate-400 text-xs mb-1">Positioning</p>
+                          <p className="text-white font-semibold">{selectedPlayerFraud.positioningScore.toFixed(0)}%</p>
+                        </div>
+                        <div className="bg-slate-800/50 rounded-lg p-3">
+                          <p className="text-slate-400 text-xs mb-1">Reaction Time</p>
+                          <p className="text-white font-semibold">{selectedPlayerFraud.reactionScore.toFixed(0)}%</p>
+                        </div>
+                        <div className="bg-slate-800/50 rounded-lg p-3">
+                          <p className="text-slate-400 text-xs mb-1">Risk Level</p>
+                          <p
+                            className={`font-semibold text-xs uppercase ${
+                              selectedPlayerFraud.riskLevel === "critical"
+                                ? "text-red-400"
+                                : selectedPlayerFraud.riskLevel === "high"
+                                  ? "text-orange-400"
+                                  : selectedPlayerFraud.riskLevel === "medium"
+                                    ? "text-yellow-400"
+                                    : "text-green-400"
+                            }`}
+                          >
+                            {selectedPlayerFraud.riskLevel}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                {/* Selected Player Analysis */}
-                {selectedPlayer && (
-                  <div className="space-y-4 animate-fadeIn">
-                    {(() => {
-                      const player = mockPlayers.find((p) => p.name === selectedPlayer);
-                      return player ? (
-                        <>
-                          {/* Fraud Probability - Large Display */}
-                          <Card className="border-slate-700 bg-gradient-to-br from-slate-900/50 to-slate-800/50 backdrop-blur overflow-hidden">
-                            <CardHeader>
-                              <CardTitle className="text-white text-lg">Fraud Risk Assessment</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                              <div className="space-y-6">
-                                <div className="text-center py-6 bg-slate-900/50 rounded-lg">
-                                  <div className="inline-flex items-end justify-center gap-1 mb-4">
-                                    <span className="text-6xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                                      {player.cheatProbability}
-                                    </span>
-                                    <span className="text-2xl text-slate-400 mb-2">%</span>
-                                  </div>
-                                  <p className="text-slate-300 text-sm">Estimated fraud probability based on gameplay patterns</p>
-                                </div>
+                {/* Player Statistics */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-slate-400 text-sm font-medium">K/D Ratio</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold text-white">
+                        {selectedPlayerData.kdRatio.toFixed(2)}
+                      </div>
+                      <p className="text-slate-400 text-sm mt-1">
+                        {selectedPlayerData.kills} Kills / {selectedPlayerData.deaths} Deaths
+                      </p>
+                    </CardContent>
+                  </Card>
 
-                                {/* Risk Level Indicator */}
-                                <div>
-                                  <p className="text-slate-300 text-sm font-medium mb-3">Risk Level</p>
-                                  <div className="w-full bg-slate-800 rounded-full h-2">
-                                    <div
-                                      className={`h-2 rounded-full transition-all ${
-                                        player.cheatProbability > 60
-                                          ? "bg-red-500"
-                                          : player.cheatProbability > 30
-                                            ? "bg-yellow-500"
-                                            : "bg-green-500"
-                                      }`}
-                                      style={{ width: `${player.cheatProbability}%` }}
-                                    ></div>
-                                  </div>
-                                  <div className="flex justify-between mt-2 text-xs text-slate-400">
-                                    <span>Low</span>
-                                    <span>Medium</span>
-                                    <span>High</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
+                  <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-slate-400 text-sm font-medium">Accuracy</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold text-white">
+                        {(selectedPlayerData.accuracy * 100).toFixed(1)}%
+                      </div>
+                      <p className="text-slate-400 text-sm mt-1">Overall shot accuracy</p>
+                    </CardContent>
+                  </Card>
 
-                          {/* Player Stats Grid */}
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
-                              <CardHeader className="pb-3">
-                                <CardTitle className="text-slate-400 text-sm font-medium">K/D Ratio</CardTitle>
-                              </CardHeader>
-                              <CardContent>
-                                <div className="text-3xl font-bold text-white">
-                                  {(player.kills / player.deaths).toFixed(2)}
-                                </div>
-                                <p className="text-slate-400 text-sm mt-1">
-                                  {player.kills} Kills / {player.deaths} Deaths
-                                </p>
-                              </CardContent>
-                            </Card>
+                  <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-slate-400 text-sm font-medium">Headshot Rate</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold text-white">
+                        {selectedPlayerData.hsPercent.toFixed(1)}%
+                      </div>
+                      <p className="text-slate-400 text-sm mt-1">{selectedPlayerData.headshots} headshots</p>
+                    </CardContent>
+                  </Card>
 
-                            <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
-                              <CardHeader className="pb-3">
-                                <CardTitle className="text-slate-400 text-sm font-medium">Headshot %</CardTitle>
-                              </CardHeader>
-                              <CardContent>
-                                <div className="text-3xl font-bold text-white">
-                                  {((player.headshots / player.kills) * 100).toFixed(1)}%
-                                </div>
-                                <p className="text-slate-400 text-sm mt-1">{player.headshots} headshots</p>
-                              </CardContent>
-                            </Card>
+                  <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-slate-400 text-sm font-medium">Damage</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold text-white">
+                        {selectedPlayerData.totalDamage}
+                      </div>
+                      <p className="text-slate-400 text-sm mt-1">
+                        {selectedPlayerData.avgDamage.toFixed(1)} per round
+                      </p>
+                    </CardContent>
+                  </Card>
 
-                            <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
-                              <CardHeader className="pb-3">
-                                <CardTitle className="text-slate-400 text-sm font-medium">HLTV Rating</CardTitle>
-                              </CardHeader>
-                              <CardContent>
-                                <div className="text-3xl font-bold text-white">{player.rating.toFixed(2)}</div>
-                                <p className="text-slate-400 text-sm mt-1">Performance rating</p>
-                              </CardContent>
-                            </Card>
+                  <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-slate-400 text-sm font-medium">Rating</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold text-white">
+                        {selectedPlayerData.rating.toFixed(2)}
+                      </div>
+                      <p className="text-slate-400 text-sm mt-1">HLTV Performance Rating</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-slate-400 text-sm font-medium">Assists</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold text-white">
+                        {selectedPlayerData.assists}
+                      </div>
+                      <p className="text-slate-400 text-sm mt-1">Total assists</p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Suspicious Activities */}
+                {selectedPlayerFraud.suspiciousActivities.length > 0 && (
+                  <Card className="border-red-500/30 bg-red-500/10 backdrop-blur">
+                    <CardHeader>
+                      <CardTitle className="text-red-400 flex items-center gap-2">
+                        <AlertTriangle className="w-5 h-5" />
+                        Suspicious Indicators ({selectedPlayerFraud.suspiciousActivities.length})
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        {selectedPlayerFraud.suspiciousActivities.map((activity, idx) => (
+                          <div key={idx} className="p-3 bg-slate-900/50 rounded-lg border border-red-500/20">
+                            <div className="flex justify-between items-start gap-2 mb-1">
+                              <p className="text-white font-medium text-sm capitalize">
+                                {activity.type.replace(/_/g, " ")}
+                              </p>
+                              <span className="text-red-400 text-sm font-semibold">
+                                {activity.confidence.toFixed(0)}%
+                              </span>
+                            </div>
+                            <p className="text-red-200 text-xs">{activity.description}</p>
                           </div>
-
-                          {/* Suspicious Indicators */}
-                          {player.cheatProbability > 30 && (
-                            <Card className="border-red-500/30 bg-red-500/10 backdrop-blur">
-                              <CardHeader>
-                                <CardTitle className="text-red-400 flex items-center gap-2 text-lg">
-                                  <AlertTriangle className="w-5 h-5" />
-                                  Suspicious Indicators
-                                </CardTitle>
-                              </CardHeader>
-                              <CardContent>
-                                <ul className="space-y-2 text-red-200 text-sm">
-                                  <li>• Abnormally high accuracy in difficult clutch situations</li>
-                                  <li>• Consistent pre-fire patterns detected</li>
-                                  <li>• Head-level crosshair placement in unexpected positions</li>
-                                </ul>
-                              </CardContent>
-                            </Card>
-                          )}
-
-                          {/* View Full Match Stats */}
-                          <Button
-                            onClick={() => navigate("/match-stats")}
-                            className="w-full bg-blue-500 hover:bg-blue-600 text-white"
-                          >
-                            <BarChart3 className="w-4 h-4 mr-2" />
-                            View Full Match Statistics
-                            <ArrowRight className="w-4 h-4 ml-2" />
-                          </Button>
-                        </>
-                      ) : null;
-                    })()}
-                  </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
                 )}
-              </>
-            )}
+
+                {/* View Match Stats Button */}
+                <Button
+                  onClick={() => navigate("/match-stats")}
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                >
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  View Full Match Statistics
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+            ) : null}
           </div>
         )}
       </div>
