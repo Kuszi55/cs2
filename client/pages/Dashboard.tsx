@@ -22,6 +22,7 @@ interface PlayerStat {
 
 export default function Dashboard() {
   const { logout } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"upload" | "analysis">("upload");
   const [demoFile, setDemoFile] = useState<DemoFile | null>(null);
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
@@ -287,6 +288,16 @@ export default function Dashboard() {
                               </CardContent>
                             </Card>
                           )}
+
+                          {/* View Full Match Stats */}
+                          <Button
+                            onClick={() => navigate("/match-stats")}
+                            className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                          >
+                            <BarChart3 className="w-4 h-4 mr-2" />
+                            View Full Match Statistics
+                            <ArrowRight className="w-4 h-4 ml-2" />
+                          </Button>
                         </>
                       ) : null;
                     })()}
