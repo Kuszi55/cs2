@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ReactNode } from "react";
-import { BarChart3, Video, Settings, LogOut, Menu, X } from "lucide-react";
+import { BarChart3, Video, Settings, LogOut, Menu, X, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -20,6 +20,7 @@ export function Layout({ children, onLogout }: LayoutProps) {
 
   const navItems = [
     { label: "Dashboard", icon: BarChart3, path: "/dashboard" },
+    { label: "Match Stats", icon: TrendingUp, path: "/match-stats" },
     { label: "Clips", icon: Video, path: "/clips" },
     { label: "Settings", icon: Settings, path: "/settings" },
   ];
