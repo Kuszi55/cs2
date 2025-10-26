@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
+import { playSound } from "@/lib/sounds";
 
 export default function Login() {
   const { login } = useAuth();
@@ -17,11 +18,28 @@ export default function Login() {
     setError("");
     setIsLoading(true);
 
+    try {
+      playSound('click');
+    } catch (e) {
+      // Sound might not be available in all browsers
+    }
+
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     const success = login(username, password);
     if (!success) {
       setError("Invalid credentials. Please try again.");
+      try {
+        playSound('error');
+      } catch (e) {
+        // Sound might not be available in all browsers
+      }
+    } else {
+      try {
+        playSound('success');
+      } catch (e) {
+        // Sound might not be available in all browsers
+      }
     }
 
     setIsLoading(false);
