@@ -103,13 +103,13 @@ pm2 save
 cat > /etc/nginx/sites-available/cs2-analysis << 'EOF'
 server {
     listen 80;
-    server_name twoja-domena.com www.twoja-domena.com;
+    server_name cs2cheateranalysis.site cs2cheateranalysis.site;
     return 301 https://$server_name$request_uri;
 }
 
 server {
     listen 443 ssl http2;
-    server_name twoja-domena.com www.twoja-domena.com;
+    server_name cs2cheateranalysis.site cs2cheateranalysis.site;
 
     client_max_body_size 500M;
 
