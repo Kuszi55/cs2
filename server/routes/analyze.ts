@@ -1,5 +1,5 @@
 import { Router, Request, Response, RequestHandler } from "express";
-import * as multer from "multer";
+import multer from "multer";
 import * as path from "path";
 import * as fs from "fs";
 import * as crypto from "crypto";
