@@ -66,13 +66,30 @@ const uploadAndAnalyze: RequestHandler = async (req, res) => {
     const analyzer = new DemoAnalyzer(filePath);
     const analysis = await analyzer.analyze();
 
-    // Return results
-    return res.json({
-      success: true,
-      metadata,
-      analysis,
-      uploadedFilePath: req.file.filename,
-    });
+    // Save match to database
+    try {
+      const savedMatch = MatchService.saveMatch({
+        demoFileName: req.file.originalname,
+        ...analysis,
+      });
+
+      return res.json({
+        success: true,
+        matchId: savedMatch.id,
+        metadata,
+        analysis,
+        uploadedFilePath: req.file.filename,
+      });
+    } catch (dbError) {
+      console.warn("Failed to save match to database:", dbError);
+      return res.json({
+        success: true,
+        metadata,
+        analysis,
+        uploadedFilePath: req.file.filename,
+        warning: "Analysis complete but failed to save to database",
+      });
+    }
   } catch (error) {
     if (req.file) {
       try {
