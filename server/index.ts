@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import analyzeRouter from "./routes/analyze";
+import matchesRouter from "./routes/matches";
 
 export function createServer() {
   const app = express();
@@ -22,6 +23,9 @@ export function createServer() {
 
   // Demo analysis routes
   app.use("/api/analyze", analyzeRouter);
+
+  // Matches routes
+  app.use("/api/matches", matchesRouter);
 
   return app;
 }
