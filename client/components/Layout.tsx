@@ -29,7 +29,6 @@ export function Layout({ children, onLogout }: LayoutProps) {
 
   const navItems = [
     { label: "Dashboard", icon: BarChart3, path: "/dashboard" },
-    { label: "Match Stats", icon: TrendingUp, path: "/match-stats" },
     { label: "Match History", icon: History, path: "/matches" },
     { label: "Clips", icon: Video, path: "/clips" },
     { label: "Settings", icon: Settings, path: "/settings" },
