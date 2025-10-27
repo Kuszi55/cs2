@@ -40,6 +40,14 @@ const AppRoutes = () => (
       path="/match-stats"
       element={<ProtectedRoute element={<MatchStats />} />}
     />
+    <Route
+      path="/matches"
+      element={<ProtectedRoute element={<MatchesHistory />} />}
+    />
+    <Route
+      path="/match-details/:matchId"
+      element={<ProtectedRoute element={<MatchDetails />} />}
+    />
     <Route path="/clips" element={<ProtectedRoute element={<Clips />} />} />
     <Route
       path="/settings"
