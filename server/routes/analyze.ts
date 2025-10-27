@@ -205,7 +205,12 @@ const getAnalysisStatus: RequestHandler = async (req, res) => {
 };
 
 // Routes
-router.post("/upload", upload.single("file"), multerErrorHandler, uploadAndAnalyze);
+router.post(
+  "/upload",
+  upload.single("file"),
+  multerErrorHandler,
+  uploadAndAnalyze,
+);
 router.post("/", analyzeDemo);
 router.get("/status/:fileName", getAnalysisStatus);
 
