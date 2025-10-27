@@ -12,6 +12,8 @@ import Dashboard from "./pages/Dashboard";
 import Clips from "./pages/Clips";
 import Settings from "./pages/Settings";
 import MatchStats from "./pages/MatchStats";
+import MatchesHistory from "./pages/MatchesHistory";
+import MatchDetails from "./pages/MatchDetails";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
