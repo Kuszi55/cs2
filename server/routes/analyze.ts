@@ -8,6 +8,7 @@ import {
   isValidDemoFile,
   getDemoFileMetadata,
 } from "../services/demoParser";
+import { MatchService } from "../services/matchService";
 
 const router = Router();
 
