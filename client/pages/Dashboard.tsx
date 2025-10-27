@@ -111,9 +111,11 @@ export default function Dashboard() {
             setUploadProgress(75);
             const response = JSON.parse(xhr.responseText);
             const result: AnalysisResult = response.analysis;
+            const matchId = response.matchId;
 
             setAnalysisResult(result);
             setGameMode(result.gameMode);
+            setCurrentMatchId(matchId);
             setUploadProgress(100);
             setActiveTab("analysis");
 
@@ -604,14 +606,25 @@ export default function Dashboard() {
                 )}
 
                 {/* View Match Stats Button */}
-                <Button
-                  onClick={() => navigate("/match-stats")}
-                  className="w-full bg-blue-500 hover:bg-blue-600 text-white"
-                >
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  View Full Match Statistics
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
+                <div className="flex gap-3">
+                  {currentMatchId && (
+                    <Button
+                      onClick={() => navigate(`/match-details/${currentMatchId}`)}
+                      className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
+                    >
+                      <BarChart3 className="w-4 h-4 mr-2" />
+                      View Full Match Details
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  )}
+                  <Button
+                    onClick={() => navigate("/matches")}
+                    variant="outline"
+                    className="flex-1 border-slate-700 text-slate-300 hover:text-white"
+                  >
+                    View All Matches
+                  </Button>
+                </div>
               </div>
             ) : null}
           </div>
