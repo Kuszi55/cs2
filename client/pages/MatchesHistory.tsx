@@ -2,16 +2,15 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import {
-  History,
-  Play,
-  Map,
-  Trophy,
-  Loader2,
-  AlertCircle,
-} from "lucide-react";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { History, Play, Map, Trophy, Loader2, AlertCircle } from "lucide-react";
 
 interface Match {
   id: number;
@@ -78,7 +77,9 @@ export default function MatchesHistory() {
       <div className="space-y-6">
         <div className="border-b border-slate-700 pb-6">
           <h1 className="text-4xl font-bold text-white mb-2">Match History</h1>
-          <p className="text-slate-400">View all uploaded and analyzed demo matches</p>
+          <p className="text-slate-400">
+            View all uploaded and analyzed demo matches
+          </p>
         </div>
 
         {isLoading ? (
@@ -100,7 +101,9 @@ export default function MatchesHistory() {
             <CardContent className="text-center py-12">
               <History className="w-12 h-12 text-slate-600 mx-auto mb-4 opacity-50" />
               <p className="text-slate-400 font-medium">No matches yet</p>
-              <p className="text-slate-500 text-sm mt-1">Upload a demo file to get started</p>
+              <p className="text-slate-500 text-sm mt-1">
+                Upload a demo file to get started
+              </p>
               <Button
                 onClick={() => navigate("/dashboard")}
                 className="mt-6 bg-blue-500 hover:bg-blue-600 text-white"
@@ -135,26 +138,43 @@ export default function MatchesHistory() {
                       {/* Teams and Score */}
                       <div className="flex items-center gap-4 mb-3 ml-8">
                         <div className="flex-1">
-                          <p className="text-slate-400 text-sm">{match.teamAName}</p>
-                          <p className="text-white font-bold text-lg">{match.teamAScore}</p>
+                          <p className="text-slate-400 text-sm">
+                            {match.teamAName}
+                          </p>
+                          <p className="text-white font-bold text-lg">
+                            {match.teamAScore}
+                          </p>
                         </div>
                         <div className="text-slate-500 font-semibold">vs</div>
                         <div className="flex-1 text-right">
-                          <p className="text-slate-400 text-sm">{match.teamBName}</p>
-                          <p className="text-white font-bold text-lg">{match.teamBScore}</p>
+                          <p className="text-slate-400 text-sm">
+                            {match.teamBName}
+                          </p>
+                          <p className="text-white font-bold text-lg">
+                            {match.teamBScore}
+                          </p>
                         </div>
                       </div>
 
                       {/* Details */}
                       <div className="flex flex-wrap gap-4 ml-8 text-sm">
                         <div className="text-slate-400">
-                          Duration: <span className="text-white font-medium">{formatDuration(match.duration)}</span>
+                          Duration:{" "}
+                          <span className="text-white font-medium">
+                            {formatDuration(match.duration)}
+                          </span>
                         </div>
                         <div className="text-slate-400">
-                          Uploaded: <span className="text-white font-medium">{formatDate(match.uploadedAt)}</span>
+                          Uploaded:{" "}
+                          <span className="text-white font-medium">
+                            {formatDate(match.uploadedAt)}
+                          </span>
                         </div>
                         <div className="text-slate-400">
-                          File: <span className="text-white font-medium truncate">{match.demoFileName}</span>
+                          File:{" "}
+                          <span className="text-white font-medium truncate">
+                            {match.demoFileName}
+                          </span>
                         </div>
                       </div>
                     </div>

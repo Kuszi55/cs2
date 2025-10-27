@@ -39,7 +39,7 @@ server {
     ssl_ciphers HIGH:!aNULL:!MD5;
     ssl_prefer_server_ciphers on;
 
-    # ← DODAJ/ZMIEŃ TĘ LINIĘ ← 
+    # ← DODAJ/ZMIEŃ TĘ LINIĘ ←
     client_max_body_size 1024M;
 
     gzip on;
@@ -172,11 +172,13 @@ pm2 restart cs2-analysis
 ## Jeśli Wszystko Spamięta
 
 **Krok 1:** SSH na VPS
+
 ```bash
 ssh root@146.59.126.207
 ```
 
 **Krok 2:** Aktualizuj aplikację
+
 ```bash
 cd /var/www/cs2-analysis
 git pull  # (jeśli używasz Git)
@@ -185,11 +187,13 @@ pnpm build
 ```
 
 **Krok 3:** Uruchom ponownie
+
 ```bash
 pm2 restart cs2-analysis
 ```
 
 **Krok 4:** Sprawdź logi
+
 ```bash
 pm2 logs cs2-analysis
 ```

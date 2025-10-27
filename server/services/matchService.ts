@@ -72,7 +72,8 @@ export class MatchService {
       matches.push(data.match);
     });
     return matches.sort(
-      (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+      (a, b) =>
+        new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime(),
     );
   }
 
@@ -110,7 +111,7 @@ export class MatchService {
       avgFraudProbability: (
         fraudAssessments
           .filter((f: any) =>
-            teamPlayers.find((p: any) => p.name === f.playerName)
+            teamPlayers.find((p: any) => p.name === f.playerName),
           )
           .reduce((sum: number, f: any) => sum + f.fraudProbability, 0) /
         teamPlayers.length

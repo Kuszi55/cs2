@@ -610,7 +610,9 @@ export default function Dashboard() {
                 <div className="flex gap-3">
                   {currentMatchId && (
                     <Button
-                      onClick={() => navigate(`/match-details/${currentMatchId}`)}
+                      onClick={() =>
+                        navigate(`/match-details/${currentMatchId}`)
+                      }
                       className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
                     >
                       <BarChart3 className="w-4 h-4 mr-2" />
