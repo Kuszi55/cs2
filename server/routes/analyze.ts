@@ -51,10 +51,21 @@ const uploadAndAnalyze: RequestHandler = async (req, res) => {
     }
 
     const filePath = req.file.path;
+    console.log("Upload received:", {
+      filename: req.file.filename,
+      originalname: req.file.originalname,
+      size: req.file.size,
+      path: filePath,
+    });
 
     // Validate demo file
     if (!isValidDemoFile(filePath)) {
-      fs.unlinkSync(filePath);
+      console.warn("Demo file validation failed for:", req.file.originalname);
+      try {
+        fs.unlinkSync(filePath);
+      } catch {
+        /* ignore */
+      }
       return res.status(400).json({
         error: "Invalid demo file format. Please upload a valid CS2 demo file.",
       });
@@ -62,6 +73,7 @@ const uploadAndAnalyze: RequestHandler = async (req, res) => {
 
     // Get file metadata
     const metadata = getDemoFileMetadata(filePath);
+    console.log("File metadata:", metadata);
 
     // Analyze demo
     const analyzer = new DemoAnalyzer(filePath);
@@ -105,6 +117,25 @@ const uploadAndAnalyze: RequestHandler = async (req, res) => {
       error: "Failed to analyze demo file: " + (error as Error).message,
     });
   }
+};
+
+/**
+ * Error handler for multer
+ */
+const multerErrorHandler: RequestHandler = (err: any, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    console.error("Multer error:", err);
+    if (err.code === "FILE_TOO_LARGE") {
+      return res.status(413).json({
+        error: "File is too large. Maximum file size is 1GB.",
+      });
+    }
+    return res.status(400).json({ error: err.message });
+  } else if (err) {
+    console.error("Upload error:", err);
+    return res.status(400).json({ error: err.message });
+  }
+  next();
 };
 
 /**
