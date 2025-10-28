@@ -159,8 +159,8 @@ export default function Dashboard() {
       console.error("Upload error:", error);
       setIsAnalyzing(false);
       toast({
-        title: "Error",
-        description: "Failed to upload demo file",
+        title: "Błąd",
+        description: "Nie udało się wgrać pliku demo",
         variant: "destructive",
       });
     }
@@ -178,9 +178,9 @@ export default function Dashboard() {
       <div className="space-y-6">
         {/* Header */}
         <div className="border-b border-slate-700 pb-6">
-          <h1 className="text-4xl font-bold text-white mb-2">Demo Analysis</h1>
+          <h1 className="text-4xl font-bold text-white mb-2">Analiza Demo</h1>
           <p className="text-slate-400">
-            Upload CS2 demo files for advanced cheating detection and analysis
+            Wgraj pliki demo CS2 do zaawansowanego wykrywania i analizy oszustw
           </p>
         </div>
 
@@ -194,7 +194,7 @@ export default function Dashboard() {
                 : "text-slate-400 hover:text-slate-300"
             }`}
           >
-            Upload Demo
+            Wgraj Demo
           </button>
           <button
             onClick={() => setActiveTab("analysis")}
@@ -207,7 +207,7 @@ export default function Dashboard() {
                   : "text-slate-600 cursor-not-allowed"
             }`}
           >
-            Analysis Results
+            Wyniki Analizy
           </button>
         </div>
 
@@ -218,10 +218,10 @@ export default function Dashboard() {
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <Upload className="w-5 h-5 text-blue-400" />
-                  Upload Demo File
+                  Wgraj Plik Demo
                 </CardTitle>
                 <CardDescription>
-                  Supported formats: .dem (Counter-Strike 2 demo files)
+                  Obsługiwane formaty: .dem (Pliki demo Counter-Strike 2)
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -239,20 +239,20 @@ export default function Dashboard() {
                       <>
                         <Loader2 className="w-12 h-12 text-blue-400 mx-auto mb-3 animate-spin" />
                         <p className="text-white font-medium mb-1">
-                          Analyzing demo...
+                          Analizowanie dema...
                         </p>
                         <p className="text-slate-400 text-sm">
-                          {Math.round(uploadProgress)}% complete
+                          {Math.round(uploadProgress)}% ukończone
                         </p>
                       </>
                     ) : (
                       <>
                         <Upload className="w-12 h-12 text-slate-600 group-hover:text-blue-400 mx-auto mb-3 transition-colors" />
                         <p className="text-white font-medium mb-1">
-                          Drop your demo file here
+                          Przeciągnij plik demo tutaj
                         </p>
                         <p className="text-slate-400 text-sm">
-                          or click to browse
+                          lub kliknij aby przeglądać
                         </p>
                       </>
                     )}
@@ -280,32 +280,32 @@ export default function Dashboard() {
             {/* Match Info */}
             <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
               <CardHeader>
-                <CardTitle className="text-white">Match Information</CardTitle>
+                <CardTitle className="text-white">Informacje o Meczu</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="p-3 bg-slate-800/50 rounded-lg">
-                    <p className="text-slate-400 text-sm mb-1">Map</p>
+                    <p className="text-slate-400 text-sm mb-1">Mapa</p>
                     <p className="text-white font-semibold">
                       {analysisResult.mapName}
                     </p>
                   </div>
                   <div className="p-3 bg-slate-800/50 rounded-lg">
-                    <p className="text-slate-400 text-sm mb-1">Game Mode</p>
+                    <p className="text-slate-400 text-sm mb-1">Tryb Gry</p>
                     <p className="text-white font-semibold uppercase">
                       {analysisResult.gameMode}
                     </p>
                   </div>
                   <div className="p-3 bg-slate-800/50 rounded-lg">
-                    <p className="text-slate-400 text-sm mb-1">Score</p>
+                    <p className="text-slate-400 text-sm mb-1">Wynik</p>
                     <p className="text-white font-semibold">
                       {analysisResult.teamAScore} - {analysisResult.teamBScore}
                     </p>
                   </div>
                   <div className="p-3 bg-slate-800/50 rounded-lg">
-                    <p className="text-slate-400 text-sm mb-1">Players</p>
+                    <p className="text-slate-400 text-sm mb-1">Gracze</p>
                     <p className="text-white font-semibold">
-                      {analysisResult.players.length} players
+                      {analysisResult.players.length} graczy
                     </p>
                   </div>
                 </div>
