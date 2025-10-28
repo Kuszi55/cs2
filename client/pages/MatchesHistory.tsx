@@ -120,9 +120,9 @@ export default function MatchesHistory() {
     <Layout onLogout={logout}>
       <div className="space-y-6">
         <div className="border-b border-slate-700 pb-6">
-          <h1 className="text-4xl font-bold text-white mb-2">Match History</h1>
+          <h1 className="text-4xl font-bold text-white mb-2">Historia Meczów</h1>
           <p className="text-slate-400">
-            View all uploaded and analyzed demo matches
+            Przeglądaj wszystkie wgrane i przeanalizowane mecze
           </p>
         </div>
 
@@ -130,7 +130,7 @@ export default function MatchesHistory() {
           <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
             <CardContent className="flex items-center justify-center py-12">
               <Loader2 className="w-8 h-8 text-blue-400 animate-spin mr-3" />
-              <p className="text-slate-400">Loading matches...</p>
+              <p className="text-slate-400">Ładowanie meczów...</p>
             </CardContent>
           </Card>
         ) : error ? (
@@ -144,16 +144,16 @@ export default function MatchesHistory() {
           <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
             <CardContent className="text-center py-12">
               <History className="w-12 h-12 text-slate-600 mx-auto mb-4 opacity-50" />
-              <p className="text-slate-400 font-medium">No matches yet</p>
+              <p className="text-slate-400 font-medium">Brak meczów</p>
               <p className="text-slate-500 text-sm mt-1">
-                Upload a demo file to get started
+                Wgraj plik demo aby zacząć
               </p>
               <Button
                 onClick={() => navigate("/dashboard")}
                 className="mt-6 bg-blue-500 hover:bg-blue-600 text-white"
               >
                 <Play className="w-4 h-4 mr-2" />
-                Upload Demo
+                Wgraj Demo
               </Button>
             </CardContent>
           </Card>
