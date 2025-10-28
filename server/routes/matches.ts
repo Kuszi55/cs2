@@ -76,9 +76,37 @@ const getMatchStats: RequestHandler = (req, res) => {
   }
 };
 
+/**
+ * DELETE /api/matches/:id
+ * Delete a specific match
+ */
+const deleteMatch: RequestHandler = (req, res) => {
+  try {
+    const { id } = req.params;
+    const matchId = parseInt(id);
+
+    const success = MatchService.deleteMatch(matchId);
+    if (!success) {
+      return res.status(404).json({
+        error: "Match not found",
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Match deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: "Failed to delete match: " + (error as Error).message,
+    });
+  }
+};
+
 // Routes
 router.get("/", getAllMatches);
 router.get("/:id", getMatchById);
 router.get("/:id/stats", getMatchStats);
+router.delete("/:id", deleteMatch);
 
 export default router;
