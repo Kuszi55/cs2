@@ -131,4 +131,15 @@ export class MatchService {
       },
     };
   }
+
+  /**
+   * Delete a match by ID
+   */
+  static deleteMatch(matchId: number): boolean {
+    if (matchesDatabase.has(matchId)) {
+      matchesDatabase.delete(matchId);
+      return true;
+    }
+    return false;
+  }
 }
