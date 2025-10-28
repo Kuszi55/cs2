@@ -318,11 +318,11 @@ export default function Dashboard() {
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
                     <BarChart3 className="w-5 h-5 text-blue-400" />
-                    Select Player to Analyze
+                    Wybierz Gracza do Analizy
                   </CardTitle>
                   <CardDescription>
-                    Choose a player to view detailed statistics and fraud
-                    assessment
+                    Wybierz gracza aby zobaczyć szczegółowe statystyki i ocenę
+                    oszustw
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -344,7 +344,7 @@ export default function Dashboard() {
                             K/D: {player.kdRatio.toFixed(2)}
                           </p>
                           <p className="text-slate-400 text-xs mt-1">
-                            Fraud:{" "}
+                            Oszustwo:{" "}
                             <span
                               className={
                                 fraud?.fraudProbability! > 50
@@ -368,14 +368,14 @@ export default function Dashboard() {
                   onClick={() => setSelectedPlayer(null)}
                   className="text-slate-400 hover:text-slate-300 text-sm font-medium transition-colors mb-2"
                 >
-                  ← Back to player list
+                  ← Powróć do listy graczy
                 </button>
 
                 {/* Fraud Probability */}
                 <Card className="border-slate-700 bg-gradient-to-br from-slate-900/50 to-slate-800/50 backdrop-blur overflow-hidden">
                   <CardHeader>
                     <CardTitle className="text-white text-lg">
-                      Fraud Assessment
+                      Ocena Oszustw
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -390,13 +390,13 @@ export default function Dashboard() {
                           </span>
                         </div>
                         <p className="text-slate-300 text-sm">
-                          Estimated fraud probability based on gameplay analysis
+                          Szacunkowe prawdopodobieństwo oszustwa oparte na analizie rozgrywki
                         </p>
                       </div>
 
                       <div>
                         <p className="text-slate-300 text-sm font-medium mb-3">
-                          Risk Level
+                          Poziom Ryzyka
                         </p>
                         <div className="w-full bg-slate-800 rounded-full h-2">
                           <div
@@ -413,10 +413,10 @@ export default function Dashboard() {
                           ></div>
                         </div>
                         <div className="flex justify-between mt-2 text-xs text-slate-400">
-                          <span>Low</span>
-                          <span>Medium</span>
-                          <span>High</span>
-                          <span>Critical</span>
+                          <span>Niska</span>
+                          <span>Średnia</span>
+                          <span>Wysoka</span>
+                          <span>Krytyczna</span>
                         </div>
                       </div>
 
@@ -424,7 +424,7 @@ export default function Dashboard() {
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         <div className="bg-slate-800/50 rounded-lg p-3">
                           <p className="text-slate-400 text-xs mb-1">
-                            Aim Score
+                            Ocena Celu
                           </p>
                           <p className="text-white font-semibold">
                             {selectedPlayerFraud.aimScore.toFixed(0)}%
@@ -432,7 +432,7 @@ export default function Dashboard() {
                         </div>
                         <div className="bg-slate-800/50 rounded-lg p-3">
                           <p className="text-slate-400 text-xs mb-1">
-                            Positioning
+                            Pozycjonowanie
                           </p>
                           <p className="text-white font-semibold">
                             {selectedPlayerFraud.positioningScore.toFixed(0)}%
@@ -440,7 +440,7 @@ export default function Dashboard() {
                         </div>
                         <div className="bg-slate-800/50 rounded-lg p-3">
                           <p className="text-slate-400 text-xs mb-1">
-                            Reaction Time
+                            Czas Reakcji
                           </p>
                           <p className="text-white font-semibold">
                             {selectedPlayerFraud.reactionScore.toFixed(0)}%
@@ -448,7 +448,7 @@ export default function Dashboard() {
                         </div>
                         <div className="bg-slate-800/50 rounded-lg p-3">
                           <p className="text-slate-400 text-xs mb-1">
-                            Risk Level
+                            Poziom Ryzyka
                           </p>
                           <p
                             className={`font-semibold text-xs uppercase ${
