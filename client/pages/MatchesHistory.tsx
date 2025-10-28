@@ -203,19 +203,19 @@ export default function MatchesHistory() {
                       {/* Details */}
                       <div className="flex flex-wrap gap-4 ml-8 text-sm">
                         <div className="text-slate-400">
-                          Duration:{" "}
+                          Czas trwania:{" "}
                           <span className="text-white font-medium">
                             {formatDuration(match.duration)}
                           </span>
                         </div>
                         <div className="text-slate-400">
-                          Uploaded:{" "}
+                          Wgrany:{" "}
                           <span className="text-white font-medium">
                             {formatDate(match.uploadedAt)}
                           </span>
                         </div>
                         <div className="text-slate-400">
-                          File:{" "}
+                          Plik:{" "}
                           <span className="text-white font-medium truncate">
                             {match.demoFileName}
                           </span>
@@ -223,11 +223,24 @@ export default function MatchesHistory() {
                       </div>
                     </div>
 
-                    {/* Action Button */}
-                    <Button className="bg-blue-500 hover:bg-blue-600 text-white whitespace-nowrap">
-                      <Play className="w-4 h-4 mr-2" />
-                      View Analysis
-                    </Button>
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 flex-col md:flex-row">
+                      <Button
+                        onClick={() => navigate(`/match-details/${match.id}`)}
+                        className="bg-blue-500 hover:bg-blue-600 text-white whitespace-nowrap"
+                      >
+                        <Play className="w-4 h-4 mr-2" />
+                        Analiza
+                      </Button>
+                      <Button
+                        onClick={(e) => handleDeleteMatch(e, match.id)}
+                        disabled={deletingId === match.id}
+                        className="bg-red-500/20 hover:bg-red-500/30 text-red-400 whitespace-nowrap border border-red-500/30"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        {deletingId === match.id ? "Usuwanie..." : "Usuń"}
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
