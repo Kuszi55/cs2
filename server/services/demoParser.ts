@@ -394,7 +394,7 @@ export function isValidDemoFile(filePath: string): boolean {
     // Accept HL2D (Source demo), CSGO, or other potential CS2 headers
     // Also accept files that start with typical demo file patterns
     const validHeaders = ["HL2D", "CSGO", "PK\x03\x04"];
-    const isValidHeader = validHeaders.some(h => header.startsWith(h));
+    const isValidHeader = validHeaders.some((h) => header.startsWith(h));
 
     // If header doesn't match known patterns, just accept it as long as it's a reasonable size
     // (the actual parsing will validate it further)
