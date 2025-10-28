@@ -75,6 +75,47 @@ export default function MatchesHistory() {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
+  const handleDeleteMatch = async (
+    e: React.MouseEvent,
+    matchId: number
+  ) => {
+    e.stopPropagation();
+
+    if (!window.confirm("Czy na pewno chcesz usunąć ten mecz?")) {
+      return;
+    }
+
+    try {
+      setDeletingId(matchId);
+      const response = await fetch(`/api/matches/${matchId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setMatches(matches.filter((m) => m.id !== matchId));
+        toast({
+          title: "Sukces",
+          description: "Mecz został usunięty",
+        });
+      } else {
+        toast({
+          title: "Błąd",
+          description: "Nie udało się usunąć meczu",
+          variant: "destructive",
+        });
+      }
+    } catch (err) {
+      console.error("Error deleting match:", err);
+      toast({
+        title: "Błąd",
+        description: "Nie udało się usunąć meczu",
+        variant: "destructive",
+      });
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <Layout onLogout={logout}>
       <div className="space-y-6">
