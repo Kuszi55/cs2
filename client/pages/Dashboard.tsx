@@ -82,8 +82,8 @@ export default function Dashboard() {
 
     if (!file.name.toLowerCase().endsWith(".dem")) {
       toast({
-        title: "Invalid file format",
-        description: "Please upload a .dem file",
+        title: "Nieprawidłowy format pliku",
+        description: "Proszę wgraj plik .dem",
         variant: "destructive",
       });
       return;
@@ -121,15 +121,15 @@ export default function Dashboard() {
             setActiveTab("analysis");
 
             toast({
-              title: "Analysis complete!",
-              description: `Demo analyzed: ${result.mapName} (${result.gameMode})`,
+              title: "Analiza zakończona!",
+              description: `Demo przeanalizowano: ${result.mapName} (${result.gameMode})`,
             });
           } catch (error) {
             console.error("Parse error:", error);
             setIsAnalyzing(false);
             toast({
-              title: "Error",
-              description: "Failed to parse analysis results",
+              title: "Błąd",
+              description: "Nie udało się sparsować wyników analizy",
               variant: "destructive",
             });
           }
@@ -137,8 +137,8 @@ export default function Dashboard() {
           const errorResponse = JSON.parse(xhr.responseText);
           setIsAnalyzing(false);
           toast({
-            title: "Analysis failed",
-            description: errorResponse.error || "Failed to analyze demo",
+            title: "Analiza nie powiodła się",
+            description: errorResponse.error || "Nie udało się przeanalizować dema",
             variant: "destructive",
           });
         }
@@ -147,8 +147,8 @@ export default function Dashboard() {
       xhr.addEventListener("error", () => {
         setIsAnalyzing(false);
         toast({
-          title: "Upload failed",
-          description: "Network error during upload",
+          title: "Wgranie nie powiodło się",
+          description: "Błąd sieciowy podczas wgrania",
           variant: "destructive",
         });
       });
