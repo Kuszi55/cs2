@@ -3,12 +3,16 @@ import multer from "multer";
 import * as path from "path";
 import * as fs from "fs";
 import * as crypto from "crypto";
+import { execFile } from "child_process";
+import { promisify } from "util";
 import {
   DemoAnalyzer,
   isValidDemoFile,
   getDemoFileMetadata,
 } from "../services/demoParser";
 import { MatchService } from "../services/matchService";
+
+const execFileAsync = promisify(execFile);
 
 const router = Router();
 
@@ -42,7 +46,7 @@ const upload = multer({
 
 /**
  * POST /api/analyze/upload
- * Upload and analyze a demo file
+ * Upload and analyze a demo file using Python script on VPS
  */
 const uploadAndAnalyze: RequestHandler = async (req, res) => {
   try {
@@ -75,9 +79,41 @@ const uploadAndAnalyze: RequestHandler = async (req, res) => {
     const metadata = getDemoFileMetadata(filePath);
     console.log("File metadata:", metadata);
 
-    // Analyze demo
-    const analyzer = new DemoAnalyzer(filePath);
-    const analysis = await analyzer.analyze();
+    // Try to execute Python script for accurate demo analysis
+    let analysis: any;
+    try {
+      const pythonScriptPath = "/var/www/cs2-analysis/scripts/parse_demo.py";
+      console.log("Executing Python script:", pythonScriptPath, "with file:", filePath);
+
+      const { stdout, stderr } = await execFileAsync("python3", [
+        pythonScriptPath,
+        filePath,
+      ], {
+        timeout: 60000, // 60 second timeout
+        maxBuffer: 10 * 1024 * 1024, // 10MB buffer
+      });
+
+      if (stderr) {
+        console.warn("Python script stderr:", stderr);
+      }
+
+      try {
+        analysis = JSON.parse(stdout);
+        if (!analysis.success) {
+          throw new Error(analysis.error || "Python script failed");
+        }
+        console.log("Python script analysis successful for:", req.file.originalname);
+      } catch (parseError) {
+        console.error("Failed to parse Python script output:", parseError);
+        throw new Error("Invalid output from Python script");
+      }
+    } catch (pythonError) {
+      console.warn("Python script execution failed, falling back to DemoAnalyzer:", pythonError);
+      // Fallback to JavaScript analyzer if Python script fails
+      const analyzer = new DemoAnalyzer(filePath);
+      analysis = await analyzer.analyze();
+      console.log("Using fallback DemoAnalyzer for:", req.file.originalname);
+    }
 
     // Save match to database
     try {
