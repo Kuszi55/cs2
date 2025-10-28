@@ -158,6 +158,27 @@ const uploadAndAnalyze: RequestHandler = async (req, res) => {
 /**
  * Error handler for multer
  */
+/**
+ * Transform Python script output to MatchService format
+ */
+function transformPythonOutput(pythonData: any): any {
+  return {
+    mapName: pythonData.map || "Unknown",
+    gameMode: pythonData.gameMode || "5v5",
+    duration: pythonData.duration || 0,
+    teamAName: pythonData.teamAName || "Team A",
+    teamBName: pythonData.teamBName || "Team B",
+    teamAScore: pythonData.score?.team_a || pythonData.teamAScore || 0,
+    teamBScore: pythonData.score?.team_b || pythonData.teamBScore || 0,
+    players: pythonData.players || [],
+    fraudAssessments: pythonData.fraudAssessments || [],
+    totalEventsProcessed: pythonData.events?.length || 0,
+  };
+}
+
+/**
+ * Error handler for multer
+ */
 const multerErrorHandler: RequestHandler = (err: any, req, res, next) => {
   if (err instanceof multer.MulterError) {
     console.error("Multer error:", err);
