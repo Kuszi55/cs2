@@ -138,7 +138,8 @@ export default function Dashboard() {
           setIsAnalyzing(false);
           toast({
             title: "Analiza nie powiodła się",
-            description: errorResponse.error || "Nie udało się przeanalizować dema",
+            description:
+              errorResponse.error || "Nie udało się przeanalizować dema",
             variant: "destructive",
           });
         }
@@ -390,7 +391,8 @@ export default function Dashboard() {
                           </span>
                         </div>
                         <p className="text-slate-300 text-sm">
-                          Szacunkowe prawdopodobieństwo oszustwa oparte na analizie rozgrywki
+                          Szacunkowe prawdopodobieństwo oszustwa oparte na
+                          analizie rozgrywki
                         </p>
                       </div>
 

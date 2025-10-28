@@ -11,7 +11,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { History, Play, Map, Trophy, Loader2, AlertCircle, Trash2 } from "lucide-react";
+import {
+  History,
+  Play,
+  Map,
+  Trophy,
+  Loader2,
+  AlertCircle,
+  Trash2,
+} from "lucide-react";
 
 interface Match {
   id: number;
@@ -75,10 +83,7 @@ export default function MatchesHistory() {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const handleDeleteMatch = async (
-    e: React.MouseEvent,
-    matchId: number
-  ) => {
+  const handleDeleteMatch = async (e: React.MouseEvent, matchId: number) => {
     e.stopPropagation();
 
     if (!window.confirm("Czy na pewno chcesz usunąć ten mecz?")) {
@@ -120,7 +125,9 @@ export default function MatchesHistory() {
     <Layout onLogout={logout}>
       <div className="space-y-6">
         <div className="border-b border-slate-700 pb-6">
-          <h1 className="text-4xl font-bold text-white mb-2">Historia Meczów</h1>
+          <h1 className="text-4xl font-bold text-white mb-2">
+            Historia Meczów
+          </h1>
           <p className="text-slate-400">
             Przeglądaj wszystkie wgrane i przeanalizowane mecze
           </p>

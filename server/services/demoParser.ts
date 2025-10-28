@@ -149,9 +149,21 @@ export class DemoAnalyzer {
 
     // Realistic player names (would be extracted from demo in production)
     const playerNames = [
-      "NiKo", "s1mple", "ZywOo", "Jame", "device",
-      "Snax", "rain", "XANTARES", "ropz", "bntet",
-      "frozen", "woxic", "cadiaN", "gla1ve", "coldzera"
+      "NiKo",
+      "s1mple",
+      "ZywOo",
+      "Jame",
+      "device",
+      "Snax",
+      "rain",
+      "XANTARES",
+      "ropz",
+      "bntet",
+      "frozen",
+      "woxic",
+      "cadiaN",
+      "gla1ve",
+      "coldzera",
     ];
 
     for (let i = 0; i < playerCount; i++) {
@@ -160,7 +172,11 @@ export class DemoAnalyzer {
       const baseDeaths = Math.floor(Math.random() * 12) + 4;
 
       const player: PlayerAnalysis = {
-        name: playerNames[i % playerNames.length] + (i > playerNames.length ? ` #${Math.floor(i / playerNames.length)}` : ""),
+        name:
+          playerNames[i % playerNames.length] +
+          (i > playerNames.length
+            ? ` #${Math.floor(i / playerNames.length)}`
+            : ""),
         steamId: `${Math.floor(Math.random() * 9000000000000000) + 1000000000000000}`,
         team,
         kills: baseKills,
@@ -192,7 +208,12 @@ export class DemoAnalyzer {
 
     return {
       mapName,
-      gameMode: gameMode as "5v5" | "wingman" | "deathmatch" | "community" | "other",
+      gameMode: gameMode as
+        | "5v5"
+        | "wingman"
+        | "deathmatch"
+        | "community"
+        | "other",
       teamAName: "Counter-Terrorists",
       teamBName: "Terrorists",
       teamAScore,
@@ -208,11 +229,23 @@ export class DemoAnalyzer {
    * Extract map name from demo file
    */
   private extractMapName(): string {
-    const maps = ["Mirage", "Inferno", "Ancient", "Nuke", "Overpass", "Vertigo", "Dust2"];
+    const maps = [
+      "Mirage",
+      "Inferno",
+      "Ancient",
+      "Nuke",
+      "Overpass",
+      "Vertigo",
+      "Dust2",
+    ];
 
     // Try to find map name in file header/content
     try {
-      const header = this.fileBuffer.toString("utf-8", 0, Math.min(4096, this.fileBuffer.length));
+      const header = this.fileBuffer.toString(
+        "utf-8",
+        0,
+        Math.min(4096, this.fileBuffer.length),
+      );
       for (const map of maps) {
         if (header.includes(map.toLowerCase())) {
           return map;
