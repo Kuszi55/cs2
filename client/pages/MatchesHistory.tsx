@@ -30,9 +30,11 @@ interface Match {
 export default function MatchesHistory() {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [matches, setMatches] = useState<Match[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchMatches = async () => {
