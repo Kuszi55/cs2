@@ -81,6 +81,7 @@ const uploadAndAnalyze: RequestHandler = async (req, res) => {
 
     // Try to execute Python script for accurate demo analysis
     let analysis: any;
+    let pythonScriptUsed = false;
     try {
       const pythonScriptPath = "/var/www/cs2-analysis/scripts/parse_demo.py";
       console.log("Executing Python script:", pythonScriptPath, "with file:", filePath);
@@ -98,10 +99,12 @@ const uploadAndAnalyze: RequestHandler = async (req, res) => {
       }
 
       try {
-        analysis = JSON.parse(stdout);
-        if (!analysis.success) {
-          throw new Error(analysis.error || "Python script failed");
+        const pythonOutput = JSON.parse(stdout);
+        if (!pythonOutput.success) {
+          throw new Error(pythonOutput.error || "Python script failed");
         }
+        analysis = transformPythonOutput(pythonOutput);
+        pythonScriptUsed = true;
         console.log("Python script analysis successful for:", req.file.originalname);
       } catch (parseError) {
         console.error("Failed to parse Python script output:", parseError);
