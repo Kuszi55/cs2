@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import {
   Card,
   CardContent,
@@ -10,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { History, Play, Map, Trophy, Loader2, AlertCircle } from "lucide-react";
+import { History, Play, Map, Trophy, Loader2, AlertCircle, Trash2 } from "lucide-react";
 
 interface Match {
   id: number;
