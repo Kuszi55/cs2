@@ -23,6 +23,7 @@ cd /var/www/cs2-analysis
 ### Krok 3: Pobierz najnowszy kod
 
 Jeśli masz Git:
+
 ```bash
 git pull origin main
 ```
@@ -68,6 +69,7 @@ pm2 logs cs2-analysis
 ```
 
 Szukaj wiadomości:
+
 - ✅ "Executing Python script: /var/www/cs2-analysis/scripts/parse_demo.py"
 - ✅ "Python script analysis successful"
 
@@ -102,6 +104,7 @@ pip3 list | grep -E "demoparser|numpy|scipy|requests"
 ```
 
 Jeśli brakuje pakietów:
+
 ```bash
 pip3 install demoparser-py numpy scipy requests
 ```
@@ -111,11 +114,13 @@ pip3 install demoparser-py numpy scipy requests
 Skrypt Python ma limit 60 sekund. Duże pliki demo mogą tego przekroczać.
 
 Edytuj `server/routes/analyze.ts` i zmień:
+
 ```typescript
 timeout: 60000, // Zmień na 120000 (120 sekund)
 ```
 
 Następnie rebuild i restart:
+
 ```bash
 cd /var/www/cs2-analysis
 pnpm build
@@ -143,6 +148,7 @@ systemctl restart nginx
 ## 📊 Co się Zmieniło
 
 ### Przed Integracją (Losowe Dane)
+
 ```
 Map: Mirage (losowa)
 Team A: 12
@@ -152,6 +158,7 @@ Stats: Wszystkie random
 ```
 
 ### Po Integracji (Rzeczywiste Dane)
+
 ```
 Map: Mirage (z pliku demo)
 Team A: 16 (rzeczywisty wynik)
@@ -213,6 +220,7 @@ pm2 restart cs2-analysis
 ### Zmiana timeout (jeśli demo analizuje się długo)
 
 W pliku `server/routes/analyze.ts` zmień:
+
 ```typescript
 timeout: 60000, // Domyślnie 60 sekund
 // na
@@ -222,6 +230,7 @@ timeout: 120000, // 120 sekund
 ### Zmiana ścieżki skryptu
 
 Jeśli skrypt jest w innym miejscu:
+
 ```typescript
 const pythonScriptPath = "/nowa/sciezka/parse_demo.py";
 ```
@@ -251,6 +260,7 @@ tail -f /var/log/nginx/error.log
 ## 🎉 Wiadomości Powodzenia w Logach
 
 Szukaj tych wiadomości:
+
 ```
 Upload received: { filename: 'demo.dem', size: 5242880, path: '...' }
 File metadata: { fileSize: 5242880, fileSizeMB: '5.00' }
@@ -265,6 +275,7 @@ Jeśli widzisz te wiadomości = **WSZYSTKO DZIAŁA!** ✅
 ## ⚠️ Komunikaty o Fallback
 
 Jeśli widzisz:
+
 ```
 Python script execution failed, falling back to DemoAnalyzer
 ```
@@ -280,9 +291,10 @@ Sprawdź Python script i pakiety.
 **Zrobione:**
 ✅ Kod zmodyfikowany  
 ✅ Dev server restart  
-✅ Ready do wdrożenia  
+✅ Ready do wdrożenia
 
 **Dalej:**
+
 1. Pobierz kod: `git pull origin main`
 2. Zbuduj: `pnpm build`
 3. Restartuj: `pm2 restart cs2-analysis`

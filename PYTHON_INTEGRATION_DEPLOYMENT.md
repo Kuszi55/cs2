@@ -3,6 +3,7 @@
 This guide covers deploying the updated Node.js backend that integrates with the Python demo parsing script on your VPS.
 
 **Prerequisites:**
+
 - Python script installed at: `/var/www/cs2-analysis/scripts/parse_demo.py`
 - Python packages installed: `demoparser-py`, `numpy`, `scipy`, `requests`
 - Application running on VPS at: `146.59.126.207`
@@ -26,6 +27,7 @@ cd /var/www/cs2-analysis
 ### Step 3: Pull the latest code
 
 If using Git:
+
 ```bash
 git pull origin main
 ```
@@ -58,6 +60,7 @@ pm2 logs cs2-analysis
 ## What Changed
 
 The backend now:
+
 1. **Executes the Python script** at `/var/www/cs2-analysis/scripts/parse_demo.py` when a demo is uploaded
 2. **Parses the JSON output** from the Python script for real demo analysis
 3. **Falls back to JavaScript analyzer** if the Python script fails (for reliability)
@@ -81,6 +84,7 @@ pm2 logs cs2-analysis
 ```
 
 Look for messages like:
+
 - ✅ "Executing Python script: /var/www/cs2-analysis/scripts/parse_demo.py"
 - ✅ "Python script analysis successful"
 
@@ -119,16 +123,19 @@ pip3 list | grep -E "demoparser|numpy|scipy|requests"
 The Python script has a 60-second timeout. Large demo files may exceed this. If needed, increase timeout in `server/routes/analyze.ts`:
 
 Find this line:
+
 ```typescript
 timeout: 60000, // 60 second timeout
 ```
 
 And change to:
+
 ```typescript
 timeout: 120000, // 120 second timeout
 ```
 
 Then rebuild and restart:
+
 ```bash
 cd /var/www/cs2-analysis
 pnpm build
@@ -190,6 +197,7 @@ pm2 restart cs2-analysis
 ## Next Steps
 
 Once verified working:
+
 1. Monitor logs for 24 hours to ensure stability
 2. Test with various demo file sizes
 3. Verify match data accuracy in the database
@@ -200,6 +208,7 @@ Once verified working:
 ## Support
 
 If issues persist:
+
 1. Check full error logs: `pm2 logs cs2-analysis`
 2. Verify Python script works standalone: `python3 /var/www/cs2-analysis/scripts/parse_demo.py <test-demo.dem>`
 3. Check system resources: `htop`

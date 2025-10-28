@@ -84,15 +84,21 @@ const uploadAndAnalyze: RequestHandler = async (req, res) => {
     let pythonScriptUsed = false;
     try {
       const pythonScriptPath = "/var/www/cs2-analysis/scripts/parse_demo.py";
-      console.log("Executing Python script:", pythonScriptPath, "with file:", filePath);
-
-      const { stdout, stderr } = await execFileAsync("python3", [
+      console.log(
+        "Executing Python script:",
         pythonScriptPath,
+        "with file:",
         filePath,
-      ], {
-        timeout: 60000, // 60 second timeout
-        maxBuffer: 10 * 1024 * 1024, // 10MB buffer
-      });
+      );
+
+      const { stdout, stderr } = await execFileAsync(
+        "python3",
+        [pythonScriptPath, filePath],
+        {
+          timeout: 60000, // 60 second timeout
+          maxBuffer: 10 * 1024 * 1024, // 10MB buffer
+        },
+      );
 
       if (stderr) {
         console.warn("Python script stderr:", stderr);
@@ -105,13 +111,19 @@ const uploadAndAnalyze: RequestHandler = async (req, res) => {
         }
         analysis = transformPythonOutput(pythonOutput);
         pythonScriptUsed = true;
-        console.log("Python script analysis successful for:", req.file.originalname);
+        console.log(
+          "Python script analysis successful for:",
+          req.file.originalname,
+        );
       } catch (parseError) {
         console.error("Failed to parse Python script output:", parseError);
         throw new Error("Invalid output from Python script");
       }
     } catch (pythonError) {
-      console.warn("Python script execution failed, falling back to DemoAnalyzer:", pythonError);
+      console.warn(
+        "Python script execution failed, falling back to DemoAnalyzer:",
+        pythonError,
+      );
       // Fallback to JavaScript analyzer if Python script fails
       const analyzer = new DemoAnalyzer(filePath);
       analysis = await analyzer.analyze();

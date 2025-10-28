@@ -11,6 +11,7 @@ The CS2 Analysis backend has been successfully updated to integrate with the Pyt
 ### 1. `server/routes/analyze.ts`
 
 **Changes Made:**
+
 - Added imports for `execFile` and `promisify` from Node.js `child_process` module
 - Created `transformPythonOutput()` function to map Python script output to MatchService format
 - Updated `uploadAndAnalyze()` handler to:
@@ -45,13 +46,14 @@ function transformPythonOutput(pythonData: any): any {
 }
 
 // In uploadAndAnalyze handler:
-const { stdout, stderr } = await execFileAsync("python3", [
-  "/var/www/cs2-analysis/scripts/parse_demo.py",
-  filePath,
-], {
-  timeout: 60000, // 60 second timeout
-  maxBuffer: 10 * 1024 * 1024, // 10MB buffer
-});
+const { stdout, stderr } = await execFileAsync(
+  "python3",
+  ["/var/www/cs2-analysis/scripts/parse_demo.py", filePath],
+  {
+    timeout: 60000, // 60 second timeout
+    maxBuffer: 10 * 1024 * 1024, // 10MB buffer
+  },
+);
 ```
 
 ---
@@ -83,35 +85,40 @@ const { stdout, stderr } = await execFileAsync("python3", [
 ✅ **Reliable Fallback** - JavaScript analyzer available if Python fails  
 ✅ **Comprehensive Logging** - Full debug information in PM2 logs  
 ✅ **Timeout Protection** - 60-second timeout prevents hanging  
-✅ **Large File Support** - 10MB buffer for parsing large JSON output  
+✅ **Large File Support** - 10MB buffer for parsing large JSON output
 
 ---
 
 ## Expected Results
 
 ### Before Integration
+
 ```json
 {
-  "mapName": "Mirage",          // Random
-  "teamAScore": 12,              // Mock data
-  "teamBScore": 8,               // Mock data
-  "players": [                   // Generated players
-    {"name": "Player1", "kills": 15, "deaths": 8}
+  "mapName": "Mirage", // Random
+  "teamAScore": 12, // Mock data
+  "teamBScore": 8, // Mock data
+  "players": [
+    // Generated players
+    { "name": "Player1", "kills": 15, "deaths": 8 }
   ]
 }
 ```
 
 ### After Integration
+
 ```json
 {
-  "mapName": "Mirage",           // From demo file
-  "teamAScore": 16,              // Real match score
-  "teamBScore": 9,               // Real match score
-  "players": [                   // Real player stats
-    {"name": "s1mple", "kills": 23, "deaths": 4, "accuracy": 0.67}
+  "mapName": "Mirage", // From demo file
+  "teamAScore": 16, // Real match score
+  "teamBScore": 9, // Real match score
+  "players": [
+    // Real player stats
+    { "name": "s1mple", "kills": 23, "deaths": 4, "accuracy": 0.67 }
   ],
-  "fraudAssessments": [          // AI cheat analysis
-    {"playerName": "s1mple", "fraudProbability": 5.2, "riskLevel": "low"}
+  "fraudAssessments": [
+    // AI cheat analysis
+    { "playerName": "s1mple", "fraudProbability": 5.2, "riskLevel": "low" }
   ]
 }
 ```
@@ -123,6 +130,7 @@ const { stdout, stderr } = await execFileAsync("python3", [
 See `PYTHON_INTEGRATION_DEPLOYMENT.md` for detailed instructions.
 
 **Quick Version:**
+
 ```bash
 cd /var/www/cs2-analysis
 git pull origin main           # Get latest code
@@ -148,21 +156,27 @@ pm2 logs cs2-analysis         # Check logs
 ## Configuration
 
 ### Timeout (in `server/routes/analyze.ts`)
+
 ```typescript
 timeout: 60000, // Default: 60 seconds
 ```
+
 Increase if demos take longer to analyze.
 
 ### Buffer Size
+
 ```typescript
 maxBuffer: 10 * 1024 * 1024, // Default: 10MB
 ```
+
 Increase if demos generate very large JSON output.
 
 ### Script Path
+
 ```typescript
 const pythonScriptPath = "/var/www/cs2-analysis/scripts/parse_demo.py";
 ```
+
 Update if Python script location changes.
 
 ---
@@ -174,14 +188,17 @@ pm2 logs cs2-analysis
 ```
 
 **Success Messages:**
+
 - ✅ "Executing Python script: /var/www/cs2-analysis/scripts/parse_demo.py with file: /path/to/demo.dem"
 - ✅ "Python script analysis successful for: demo_filename.dem"
 
 **Fallback Messages:**
+
 - ⚠️ "Python script execution failed, falling back to DemoAnalyzer"
 - ⚠️ "Failed to parse Python script output"
 
 **Debug Info:**
+
 - `Upload received: { filename, size, path }`
 - `File metadata: { fileSize, fileSizeMB }`
 - `Python script stderr: <error details>`
@@ -191,21 +208,25 @@ pm2 logs cs2-analysis
 ## Troubleshooting
 
 ### Python script not executing
+
 1. Verify file exists: `ls -la /var/www/cs2-analysis/scripts/parse_demo.py`
 2. Check permissions: `chmod +x /var/www/cs2-analysis/scripts/parse_demo.py`
 3. Test manually: `python3 /var/www/cs2-analysis/scripts/parse_demo.py <demo.dem>`
 
 ### Timeout issues
+
 - Increase `timeout` value in code
 - Check demo file size
 - Monitor system resources: `htop`
 
 ### Missing Python packages
+
 ```bash
 pip3 install demoparser-py numpy scipy requests
 ```
 
 ### App crashes after deployment
+
 ```bash
 pm2 restart cs2-analysis
 pm2 logs cs2-analysis
@@ -227,6 +248,7 @@ tail -f /var/log/nginx/error.log
 ## Future Enhancements
 
 Potential improvements:
+
 1. Queue system for processing multiple demos
 2. Async background processing with WebSocket updates
 3. Caching for duplicate demo files
