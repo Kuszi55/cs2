@@ -72,7 +72,7 @@ export function Layout({ children, onLogout }: LayoutProps) {
               <div>
                 <h1 className="font-bold text-white">CS2 Analysis</h1>
                 <p className="text-xs text-slate-400">
-                  Professional Demo Analyzer
+                  Profesjonalny Analizator Demo
                 </p>
               </div>
             </div>
