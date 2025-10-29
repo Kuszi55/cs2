@@ -1,47 +1,30 @@
 #!/usr/bin/env python3
-import sys
-import json
-from demoparser import DemoParser
+import subprocess, sys, json, os, time
 
-def main():
-    if len(sys.argv) < 2:
-        print(json.dumps({"error": "No file provided"}))
-        sys.exit(1)
+if len(sys.argv) < 2:
+    print(json.dumps({"success": False, "error": "No demo file provided"})); sys.exit(1)
 
-    filepath = sys.argv[1]
+demo_path = sys.argv[1]
+cs2json_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "scripts", "cs2json")
+log_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "logs", "parser.log")
+
+def log(msg):
     try:
-        parser = DemoParser(filepath)
-        info = parser.parse_event_stream()
+        with open(log_path, "a") as f: f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} - {msg}\n")
+    except: pass
 
-        players_stats = []
-        for p in info['players']:
-            player = {
-                "name": p.get('name', ''),
-                "steam_id": p.get('steamid', ''),
-                "team": p.get('team', ''),
-                "kills": p.get('kills', 0),
-                "deaths": p.get('deaths', 0),
-                "assists": p.get('assists', 0)
-            }
-            players_stats.append(player)
+if not os.path.exists(cs2json_path):
+    msg = f"cs2json binary not found at {cs2json_path}"; log(msg); print(json.dumps({"success": False, "error": msg})); sys.exit(1)
+if not os.path.exists(demo_path):
+    msg = f"demo not found: {demo_path}"; log(msg); print(json.dumps({"success": False, "error": msg})); sys.exit(1)
 
-        rounds = info.get('rounds', [])
-        score = {
-            "team_a": sum(1 for r in rounds if r.get('winner') == "CT"),
-            "team_b": sum(1 for r in rounds if r.get('winner') == "T")
-        }
-
-        result = {
-            "success": True,
-            "map": info.get('map', 'Unknown'),
-            "players": players_stats,
-            "score": score,
-            "rounds": len(rounds),
-        }
-        print(json.dumps(result))
-    except Exception as e:
-        print(json.dumps({"success": False, "error": str(e)}))
-        sys.exit(1)
-
-if __name__ == "__main__":
-    main()
+try:
+    proc = subprocess.run([cs2json_path, demo_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=120)
+    if proc.returncode != 0:
+        log(f"cs2json failed: {proc.stderr.strip()}"); print(json.dumps({"success": False, "error": proc.stderr.strip()})); sys.exit(1)
+    out = proc.stdout.strip()
+    try:
+        parsed = json.loads(out); print(json.dumps(parsed))
+    except Exception:
+        print(json.dumps({"success": True, "raw": out}))
+except subpr
