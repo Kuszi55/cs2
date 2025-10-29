@@ -51,7 +51,10 @@ const uploadAndAnalyze = async (req: Request, res: Response) => {
   try {
     if (!req.file) {
       console.error("❌ No file detected in request!");
-      return res.status(400).json({ error: "No file uploaded" });
+      return res.status(400).json({ 
+        success: false,
+        error: "No file uploaded" 
+      });
     }
 
     const filePath = req.file.path;
@@ -65,7 +68,10 @@ const uploadAndAnalyze = async (req: Request, res: Response) => {
     if (!isValidDemoFile(filePath)) {
       console.error("❌ Invalid demo file format:", filePath);
       try { fs.unlinkSync(filePath); } catch {}
-      return res.status(400).json({ error: "Invalid demo file format" });
+      return res.status(400).json({ 
+        success: false,
+        error: "Invalid demo file format" 
+      });
     }
 
     const metadata = getDemoFileMetadata(filePath);
@@ -85,9 +91,17 @@ const uploadAndAnalyze = async (req: Request, res: Response) => {
       console.log("Python stdout:", stdout.slice(0, 500));
 
       const pythonOutput = JSON.parse(stdout);
-      if (!pythonOutput.success) throw new Error(pythonOutput.error || "Python script failed");
+      
+      // ✅ Sprawdź czy Python zwrócił błąd
+      if (!pythonOutput.success) {
+        throw new Error(pythonOutput.error || "Python script failed");
+      }
 
-      // ⚡ Kluczowa zmiana: zawsze bierzemy analysis
+      // ✅ Sprawdź czy analysis istnieje
+      if (!pythonOutput.analysis) {
+        throw new Error("Python output missing 'analysis' field");
+      }
+
       analysis = pythonOutput.analysis;
       console.log("✅ Python analysis success:", req.file.originalname);
     } catch (pyErr) {
@@ -96,18 +110,53 @@ const uploadAndAnalyze = async (req: Request, res: Response) => {
       analysis = await analyzer.analyze();
     }
 
+    // ✅ KLUCZOWE: Sprawdź czy analysis ma wszystkie wymagane pola
+    if (!analysis.mapName || !analysis.gameMode) {
+      console.error("❌ Analysis missing required fields:", analysis);
+      return res.status(500).json({
+        success: false,
+        error: "Analysis incomplete: missing mapName or gameMode"
+      });
+    }
+
     try {
-      const savedMatch = MatchService.saveMatch({ demoFileName: req.file.originalname, ...analysis });
+      const savedMatch = MatchService.saveMatch({ 
+        demoFileName: req.file.originalname, 
+        ...analysis 
+      });
+      
       console.log("✅ Saved match:", savedMatch.id);
-      return res.json({ success: true, ...analysis, matchId: savedMatch.id, metadata });
+      
+      // ✅ POPRAWIONA STRUKTURA ODPOWIEDZI
+      return res.json({ 
+        success: true, 
+        analysis,  // ← Zawsze w polu 'analysis'
+        matchId: savedMatch.id, 
+        metadata 
+      });
     } catch (dbErr) {
       console.warn("⚠️ Failed to save match:", dbErr);
-      return res.json({ success: true, metadata, analysis, warning: "Failed to save DB" });
+      
+      // ✅ Nawet przy błędzie DB zwracamy analysis
+      return res.json({ 
+        success: true, 
+        analysis,
+        metadata, 
+        warning: "Failed to save to database" 
+      });
     }
   } catch (err) {
     console.error("🔥 Upload/analysis error:", err);
-    if (req.file) try { fs.unlinkSync(req.file.path); } catch {}
-    return res.status(500).json({ error: "Failed to analyze demo: " + (err as Error).message });
+    if (req.file) {
+      try { 
+        fs.unlinkSync(req.file.path); 
+      } catch {}
+    }
+    
+    return res.status(500).json({ 
+      success: false,
+      error: "Failed to analyze demo: " + (err as Error).message 
+    });
   }
 };
 
@@ -115,10 +164,21 @@ const uploadAndAnalyze = async (req: Request, res: Response) => {
 const multerErrorHandler = (err: any, _req: Request, res: Response, next: NextFunction) => {
   console.error("💥 Multer upload error:", err);
   if (err instanceof MulterError) {
-    if (err.code === "LIMIT_FILE_SIZE") return res.status(413).json({ error: "File too large. Max 1GB." });
-    return res.status(400).json({ error: err.message });
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res.status(413).json({ 
+        success: false,
+        error: "File too large. Max 1GB." 
+      });
+    }
+    return res.status(400).json({ 
+      success: false,
+      error: err.message 
+    });
   } else if (err) {
-    return res.status(400).json({ error: err.message });
+    return res.status(400).json({ 
+      success: false,
+      error: err.message 
+    });
   }
   next();
 };
