@@ -33,7 +33,7 @@ const upload = multer({
   storage,
   fileFilter: (_req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
-    cb(ext === ".dem", ext === ".dem" ? null : new Error("Only .dem files are supported"));
+    cb(null, ext === ".dem");
   },
   limits: { fileSize: 1024 * 1024 * 1024 }, // 1GB
 });
@@ -92,9 +92,8 @@ const uploadAndAnalyze = async (req: Request, res: Response) => {
 
       analysis = transformOutput(pythonOutput);
       console.log("Python analysis successful for:", req.file.originalname);
-    } catch (pyErr) {
-      console.warn("Python failed, using Go parser:", pyErr);
-
+    } catch {
+      // Fallback Go parser
       try {
         const goParser = "/var/www/cs2-analysis/scripts/cs2json";
         const { stdout, stderr } = await execFileAsync(goParser, [filePath], {
@@ -109,9 +108,7 @@ const uploadAndAnalyze = async (req: Request, res: Response) => {
 
         analysis = transformOutput(goOutput);
         console.log("Go parser analysis successful for:", req.file.originalname);
-      } catch (goErr) {
-        console.error("Go parser failed too:", goErr);
-        // Fallback JS analyzer as last resort
+      } catch {
         const analyzer = new DemoAnalyzer(filePath);
         analysis = await analyzer.analyze();
         console.log("Fallback JS analyzer used for:", req.file.originalname);
@@ -122,13 +119,11 @@ const uploadAndAnalyze = async (req: Request, res: Response) => {
     try {
       const savedMatch = MatchService.saveMatch({ demoFileName: req.file.originalname, ...analysis });
       return res.json({ success: true, matchId: savedMatch.id, metadata, analysis, uploadedFilePath: req.file.filename });
-    } catch (dbErr) {
-      console.warn("Failed to save match:", dbErr);
+    } catch {
       return res.json({ success: true, metadata, analysis, uploadedFilePath: req.file.filename, warning: "Failed to save to DB" });
     }
   } catch (err) {
     if (req.file) try { fs.unlinkSync(req.file.path); } catch {}
-    console.error("Upload/analysis error:", err);
     return res.status(500).json({ error: "Failed to analyze demo file: " + (err as Error).message });
   }
 };
@@ -136,11 +131,9 @@ const uploadAndAnalyze = async (req: Request, res: Response) => {
 // Multer error handler
 const multerErrorHandler = (err: any, _req: Request, res: Response, next: NextFunction) => {
   if (err instanceof MulterError) {
-    console.error("Multer error:", err);
     if (err.code === "LIMIT_FILE_SIZE") return res.status(413).json({ error: "File too large. Max 1GB." });
     return res.status(400).json({ error: err.message });
   } else if (err) {
-    console.error("Upload error:", err);
     return res.status(400).json({ error: err.message });
   }
   next();
@@ -160,7 +153,6 @@ const analyzeDemo = async (req: Request, res: Response) => {
     const analysis = await analyzer.analyze();
     return res.json({ success: true, analysis });
   } catch (err) {
-    console.error("Analysis error:", err);
     return res.status(500).json({ error: "Failed to analyze demo: " + (err as Error).message });
   }
 };
