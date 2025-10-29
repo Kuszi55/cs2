@@ -16,8 +16,6 @@ import {
   AlertTriangle,
   ArrowRight,
   Loader2,
-  CheckCircle,
-  XCircle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -112,7 +110,7 @@ export default function Dashboard() {
             setUploadProgress(75);
             const response = JSON.parse(xhr.responseText);
             
-            // ✅ KLUCZOWA NAPRAWA: Sprawdź czy response istnieje
+            // ✅ Sprawdź czy response istnieje
             if (!response) {
               setIsAnalyzing(false);
               toast({
@@ -396,18 +394,18 @@ export default function Dashboard() {
                             {player.name}
                           </p>
                           <p className="text-slate-400 text-xs mt-1">
-                            K/D: {player.kdRatio.toFixed(2)}
+                            K/D: {(player.kdRatio || 0).toFixed(2)}
                           </p>
                           <p className="text-slate-400 text-xs mt-1">
                             Oszustwo:{" "}
                             <span
                               className={
-                                fraud?.fraudProbability! > 50
+                                (fraud?.fraudProbability || 0) > 50
                                   ? "text-red-400"
                                   : "text-green-400"
                               }
                             >
-                              {fraud?.fraudProbability?.toFixed(0)}%
+                              {(fraud?.fraudProbability || 0).toFixed(0)}%
                             </span>
                           </p>
                         </button>
@@ -438,7 +436,7 @@ export default function Dashboard() {
                       <div className="text-center py-6 bg-slate-900/50 rounded-lg">
                         <div className="inline-flex items-end justify-center gap-1 mb-4">
                           <span className="text-6xl font-bold gradient-text">
-                            {selectedPlayerFraud.fraudProbability.toFixed(1)}
+                            {(selectedPlayerFraud.fraudProbability || 0).toFixed(1)}
                           </span>
                           <span className="text-2xl text-slate-400 mb-2">
                             %
@@ -457,14 +455,14 @@ export default function Dashboard() {
                         <div className="w-full bg-slate-800 rounded-full h-2">
                           <div
                             className={`h-2 rounded-full transition-all ${
-                              selectedPlayerFraud.fraudProbability > 60
+                              (selectedPlayerFraud.fraudProbability || 0) > 60
                                 ? "bg-red-500"
-                                : selectedPlayerFraud.fraudProbability > 30
+                                : (selectedPlayerFraud.fraudProbability || 0) > 30
                                   ? "bg-yellow-500"
                                   : "bg-green-500"
                             }`}
                             style={{
-                              width: `${selectedPlayerFraud.fraudProbability}%`,
+                              width: `${selectedPlayerFraud.fraudProbability || 0}%`,
                             }}
                           ></div>
                         </div>
@@ -483,7 +481,7 @@ export default function Dashboard() {
                             Ocena Celu
                           </p>
                           <p className="text-white font-semibold">
-                            {selectedPlayerFraud.aimScore.toFixed(0)}%
+                            {(selectedPlayerFraud.aimScore || 0).toFixed(0)}%
                           </p>
                         </div>
                         <div className="bg-slate-800/50 rounded-lg p-3">
@@ -491,7 +489,7 @@ export default function Dashboard() {
                             Pozycjonowanie
                           </p>
                           <p className="text-white font-semibold">
-                            {selectedPlayerFraud.positioningScore.toFixed(0)}%
+                            {(selectedPlayerFraud.positioningScore || 0).toFixed(0)}%
                           </p>
                         </div>
                         <div className="bg-slate-800/50 rounded-lg p-3">
@@ -499,7 +497,7 @@ export default function Dashboard() {
                             Czas Reakcji
                           </p>
                           <p className="text-white font-semibold">
-                            {selectedPlayerFraud.reactionScore.toFixed(0)}%
+                            {(selectedPlayerFraud.reactionScore || 0).toFixed(0)}%
                           </p>
                         </div>
                         <div className="bg-slate-800/50 rounded-lg p-3">
@@ -535,11 +533,11 @@ export default function Dashboard() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-3xl font-bold text-white">
-                        {selectedPlayerData.kdRatio.toFixed(2)}
+                        {(selectedPlayerData.kdRatio || 0).toFixed(2)}
                       </div>
                       <p className="text-slate-400 text-sm mt-1">
-                        {selectedPlayerData.kills} Kills /{" "}
-                        {selectedPlayerData.deaths} Deaths
+                        {selectedPlayerData.kills || 0} Kills /{" "}
+                        {selectedPlayerData.deaths || 0} Deaths
                       </p>
                     </CardContent>
                   </Card>
@@ -552,7 +550,7 @@ export default function Dashboard() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-3xl font-bold text-white">
-                        {(selectedPlayerData.accuracy * 100).toFixed(1)}%
+                        {((selectedPlayerData.accuracy || 0) * 100).toFixed(1)}%
                       </div>
                       <p className="text-slate-400 text-sm mt-1">
                         Overall shot accuracy
@@ -568,10 +566,10 @@ export default function Dashboard() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-3xl font-bold text-white">
-                        {selectedPlayerData.hsPercent.toFixed(1)}%
+                        {(selectedPlayerData.hsPercent || 0).toFixed(1)}%
                       </div>
                       <p className="text-slate-400 text-sm mt-1">
-                        {selectedPlayerData.headshots} headshots
+                        {selectedPlayerData.headshots || 0} headshots
                       </p>
                     </CardContent>
                   </Card>
@@ -584,10 +582,10 @@ export default function Dashboard() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-3xl font-bold text-white">
-                        {selectedPlayerData.totalDamage}
+                        {selectedPlayerData.totalDamage || 0}
                       </div>
                       <p className="text-slate-400 text-sm mt-1">
-                        {selectedPlayerData.avgDamage.toFixed(1)} per round
+                        {(selectedPlayerData.avgDamage || 0).toFixed(1)} per round
                       </p>
                     </CardContent>
                   </Card>
@@ -600,7 +598,7 @@ export default function Dashboard() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-3xl font-bold text-white">
-                        {selectedPlayerData.rating.toFixed(2)}
+                        {(selectedPlayerData.rating || 0).toFixed(2)}
                       </div>
                       <p className="text-slate-400 text-sm mt-1">
                         HLTV Performance Rating
@@ -616,7 +614,7 @@ export default function Dashboard() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-3xl font-bold text-white">
-                        {selectedPlayerData.assists}
+                        {selectedPlayerData.assists || 0}
                       </div>
                       <p className="text-slate-400 text-sm mt-1">
                         Total assists
@@ -626,7 +624,8 @@ export default function Dashboard() {
                 </div>
 
                 {/* Suspicious Activities */}
-                {selectedPlayerFraud.suspiciousActivities.length > 0 && (
+                {selectedPlayerFraud.suspiciousActivities && 
+                 selectedPlayerFraud.suspiciousActivities.length > 0 && (
                   <Card className="border-red-500/30 bg-red-500/10 backdrop-blur">
                     <CardHeader>
                       <CardTitle className="text-red-400 flex items-center gap-2">
@@ -648,7 +647,7 @@ export default function Dashboard() {
                                   {activity.type.replace(/_/g, " ")}
                                 </p>
                                 <span className="text-red-400 text-sm font-semibold">
-                                  {activity.confidence.toFixed(0)}%
+                                  {(activity.confidence || 0).toFixed(0)}%
                                 </span>
                               </div>
                               <p className="text-red-200 text-xs">
