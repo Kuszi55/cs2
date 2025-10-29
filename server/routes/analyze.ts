@@ -1,127 +1,83 @@
-import { Router, Request, Response, NextFunction } from "express";
-import multer, { MulterError } from "multer";
-import * as path from "path";
-import * as fs from "fs";
-import * as crypto from "crypto";
-import { execFile } from "child_process";
-import { promisify } from "util";
-import {
-  DemoAnalyzer,
-  isValidDemoFile,
-  getDemoFileMetadata,
-} from "../services/demoParser";
-import { MatchService } from "../services/matchService";
+#!/usr/bin/env python3
+import subprocess
+import sys
+import json
+import os
+import time
 
-const execFileAsync = promisify(execFile);
-const router = Router();
+# Ścieżki
+BASE = os.path.dirname(os.path.dirname(__file__))
+CS2JSON = os.path.join(BASE, "scripts", "cs2json")
+LOGDIR = os.path.join(BASE, "logs")
+LOGFILE = os.path.join(LOGDIR, "parser.log")
+os.makedirs(LOGDIR, exist_ok=True)
 
-// 🔹 Folder uploadów
-const uploadsDir = path.join(process.cwd(), "dist/spa/uploads");
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+# Funkcja logowania
+def log(msg):
+    ts = time.strftime("%Y-%m-%d %H:%M:%S")
+    try:
+        with open(LOGFILE, "a") as f:
+            f.write(f"{ts} - {msg}\n")
+    except:
+        pass
 
-// 🔹 Multer konfiguracja
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, uploadsDir),
-  filename: (_req, file, cb) => {
-    const uniqueSuffix = crypto.randomBytes(8).toString("hex");
-    cb(null, `${Date.now()}_${uniqueSuffix}${path.extname(file.originalname)}`);
-  },
-});
+# Sprawdzenie argumentu
+if len(sys.argv) < 2:
+    print(json.dumps({"success": False, "error": "Usage: parse_demo.py <path_to_demo>"}))
+    sys.exit(1)
 
-const upload = multer({
-  storage,
-  fileFilter: (_req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    console.log("File filter check:", file.originalname, "ext:", ext);
-    if (ext !== ".dem") {
-      console.error("❌ Rejected file:", file.originalname);
-      return cb(new Error("Only .dem files are supported"));
-    }
-    cb(null, true);
-  },
-  limits: { fileSize: 1024 * 1024 * 1024 }, // 1GB
-});
+demo_path = sys.argv[1]
 
-// 🔹 Funkcja upload + analiza
-const uploadAndAnalyze = async (req: Request, res: Response) => {
-  console.log("===== FILE UPLOAD REQUEST =====");
-  console.log("Body:", req.body);
-  console.log("File:", req.file);
+# Sprawdzenie pliku cs2json
+if not os.path.exists(CS2JSON):
+    msg = f"cs2json binary not found at {CS2JSON}"
+    log(msg)
+    print(json.dumps({"success": False, "error": msg}))
+    sys.exit(1)
 
-  try {
-    if (!req.file) {
-      console.error("❌ No file detected in request!");
-      return res.status(400).json({ error: "No file uploaded" });
-    }
+# Sprawdzenie pliku demo
+if not os.path.exists(demo_path):
+    msg = f"demo not found: {demo_path}"
+    log(msg)
+    print(json.dumps({"success": False, "error": msg}))
+    sys.exit(1)
 
-    const filePath = req.file.path;
-    console.log("Upload received:", {
-      filename: req.file.filename,
-      originalname: req.file.originalname,
-      size: req.file.size,
-      path: filePath,
-    });
+try:
+    # Wywołanie cs2json
+    proc = subprocess.run([CS2JSON, demo_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=180)
+    
+    # Logowanie stdout/stderr
+    log(f"RUN {CS2JSON} {demo_path} -> rc={proc.returncode}")
+    log("STDOUT: " + (proc.stdout[:5000] + "...(truncated)" if len(proc.stdout) > 5000 else proc.stdout))
+    log("STDERR: " + (proc.stderr[:5000] + "...(truncated)" if len(proc.stderr) > 5000 else proc.stderr))
 
-    if (!isValidDemoFile(filePath)) {
-      console.error("❌ Invalid demo file format:", filePath);
-      try { fs.unlinkSync(filePath); } catch {}
-      return res.status(400).json({ error: "Invalid demo file format" });
-    }
+    if proc.returncode != 0:
+        errtxt = proc.stderr.strip() or "cs2json failed with no output"
+        log(f"cs2json failed: {errtxt}")
+        print(json.dumps({"success": False, "error": errtxt}))
+        sys.exit(1)
 
-    const metadata = getDemoFileMetadata(filePath);
-    console.log("File metadata:", metadata);
+    # Parsowanie JSON
+    try:
+        parsed = json.loads(proc.stdout)
+        # zapewniamy obecność mapy i gameMode
+        if "map" not in parsed:
+            parsed["map"] = "Unknown"
+        if "gameMode" not in parsed:
+            parsed["gameMode"] = "Unknown"
+        # zwracamy w polu analysis, zgodnie z frontem
+        print(json.dumps({"success": True, "analysis": parsed}))
+    except Exception:
+        print(json.dumps({
+            "success": True,
+            "analysis": {"raw": proc.stdout.strip(), "map": "Unknown", "gameMode": "Unknown"}
+        }))
 
-    let analysis: any;
-
-    // 🔹 Próbujemy python3 → cs2json → JS fallback
-    try {
-      const pythonScript = "/var/www/cs2-analysis/scripts/parse_demo.py";
-      const { stdout, stderr } = await execFileAsync("python3", [pythonScript, filePath], {
-        timeout: 120000,
-        maxBuffer: 20 * 1024 * 1024,
-      });
-
-      if (stderr) console.warn("Python stderr:", stderr);
-      console.log("Python stdout:", stdout.slice(0, 500));
-
-      const pythonOutput = JSON.parse(stdout);
-      if (!pythonOutput.success) throw new Error(pythonOutput.error || "Python script failed");
-
-      analysis = pythonOutput;
-      console.log("✅ Python analysis success:", req.file.originalname);
-    } catch (pyErr) {
-      console.warn("⚠️ Python failed, fallback to JS:", pyErr);
-      const analyzer = new DemoAnalyzer(filePath);
-      analysis = await analyzer.analyze();
-    }
-
-    try {
-      const savedMatch = MatchService.saveMatch({ demoFileName: req.file.originalname, ...analysis });
-      console.log("✅ Saved match:", savedMatch.id);
-      return res.json({ success: true, ...analysis, matchId: savedMatch.id, metadata });
-    } catch (dbErr) {
-      console.warn("⚠️ Failed to save match:", dbErr);
-      return res.json({ success: true, metadata, analysis, warning: "Failed to save DB" });
-    }
-  } catch (err) {
-    console.error("🔥 Upload/analysis error:", err);
-    if (req.file) try { fs.unlinkSync(req.file.path); } catch {}
-    return res.status(500).json({ error: "Failed to analyze demo: " + (err as Error).message });
-  }
-};
-
-// 🔹 Błąd z Multer
-const multerErrorHandler = (err: any, _req: Request, res: Response, next: NextFunction) => {
-  console.error("💥 Multer upload error:", err);
-  if (err instanceof MulterError) {
-    if (err.code === "LIMIT_FILE_SIZE") return res.status(413).json({ error: "File too large. Max 1GB." });
-    return res.status(400).json({ error: err.message });
-  } else if (err) {
-    return res.status(400).json({ error: err.message });
-  }
-  next();
-};
-
-// 🔹 Endpointy
-router.post("/upload", upload.single("file"), multerErrorHandler, uploadAndAnalyze);
-export default router;
+except subprocess.TimeoutExpired:
+    log(f"Timeout for {demo_path}")
+    print(json.dumps({"success": False, "error": "cs2json timeout"}))
+    sys.exit(1)
+except Exception as e:
+    log(f"Exception running cs2json: {e}")
+    print(json.dumps({"success": False, "error": str(e)}))
+    sys.exit(1)
