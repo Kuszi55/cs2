@@ -15,11 +15,9 @@ import { MatchService } from "../services/matchService";
 const execFileAsync = promisify(execFile);
 const router = Router();
 
-// Configure uploads directory
+// Uploads directory
 const uploadsDir = path.join(process.cwd(), "dist/spa/uploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
 // Multer storage
 const storage = multer.diskStorage({
@@ -40,12 +38,26 @@ const upload = multer({
   limits: { fileSize: 1024 * 1024 * 1024 }, // 1GB
 });
 
-// Upload & analyze handler
+// Transform Go/Python output to unified format
+function transformOutput(data: any) {
+  return {
+    mapName: data.map || "Unknown",
+    gameMode: data.gameMode || "5v5",
+    duration: data.duration || 0,
+    teamAName: data.teamAName || "Team A",
+    teamBName: data.teamBName || "Team B",
+    teamAScore: data.score?.team_a || data.teamAScore || 0,
+    teamBScore: data.score?.team_b || data.teamBScore || 0,
+    players: data.players || [],
+    fraudAssessments: data.fraudAssessments || [],
+    totalEventsProcessed: data.events?.length || 0,
+  };
+}
+
+// Upload & analyze
 const uploadAndAnalyze = async (req: Request, res: Response) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ error: "No file uploaded" });
-    }
+    if (!req.file) return res.status(400).json({ error: "No file uploaded" });
 
     const filePath = req.file.path;
     console.log("Upload received:", {
@@ -65,9 +77,10 @@ const uploadAndAnalyze = async (req: Request, res: Response) => {
 
     let analysis: any;
 
+    // Try Python first
     try {
-      const pythonScriptPath = "/var/www/cs2-analysis/scripts/parse_demo.py";
-      const { stdout, stderr } = await execFileAsync("python3", [pythonScriptPath, filePath], {
+      const pythonScript = "/var/www/cs2-analysis/scripts/parse_demo.py";
+      const { stdout, stderr } = await execFileAsync("python3", [pythonScript, filePath], {
         timeout: 60000,
         maxBuffer: 10 * 1024 * 1024,
       });
@@ -77,19 +90,40 @@ const uploadAndAnalyze = async (req: Request, res: Response) => {
       const pythonOutput = JSON.parse(stdout);
       if (!pythonOutput.success) throw new Error(pythonOutput.error || "Python script failed");
 
-      analysis = transformPythonOutput(pythonOutput);
-      console.log("Python script analysis successful for:", req.file.originalname);
-    } catch (err) {
-      console.warn("Python script failed, using JS fallback:", err);
-      const analyzer = new DemoAnalyzer(filePath);
-      analysis = await analyzer.analyze();
+      analysis = transformOutput(pythonOutput);
+      console.log("Python analysis successful for:", req.file.originalname);
+    } catch (pyErr) {
+      console.warn("Python failed, using Go parser:", pyErr);
+
+      try {
+        const goParser = "/var/www/cs2-analysis/scripts/cs2json";
+        const { stdout, stderr } = await execFileAsync(goParser, [filePath], {
+          timeout: 60000,
+          maxBuffer: 10 * 1024 * 1024,
+        });
+
+        if (stderr) console.warn("Go parser stderr:", stderr);
+
+        const goOutput = JSON.parse(stdout);
+        if (!goOutput.success) throw new Error(goOutput.error || "Go parser failed");
+
+        analysis = transformOutput(goOutput);
+        console.log("Go parser analysis successful for:", req.file.originalname);
+      } catch (goErr) {
+        console.error("Go parser failed too:", goErr);
+        // Fallback JS analyzer as last resort
+        const analyzer = new DemoAnalyzer(filePath);
+        analysis = await analyzer.analyze();
+        console.log("Fallback JS analyzer used for:", req.file.originalname);
+      }
     }
 
+    // Save match
     try {
       const savedMatch = MatchService.saveMatch({ demoFileName: req.file.originalname, ...analysis });
       return res.json({ success: true, matchId: savedMatch.id, metadata, analysis, uploadedFilePath: req.file.filename });
-    } catch (dbError) {
-      console.warn("Failed to save match:", dbError);
+    } catch (dbErr) {
+      console.warn("Failed to save match:", dbErr);
       return res.json({ success: true, metadata, analysis, uploadedFilePath: req.file.filename, warning: "Failed to save to DB" });
     }
   } catch (err) {
@@ -98,22 +132,6 @@ const uploadAndAnalyze = async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Failed to analyze demo file: " + (err as Error).message });
   }
 };
-
-// Transform Python output
-function transformPythonOutput(pythonData: any) {
-  return {
-    mapName: pythonData.map || "Unknown",
-    gameMode: pythonData.gameMode || "5v5",
-    duration: pythonData.duration || 0,
-    teamAName: pythonData.teamAName || "Team A",
-    teamBName: pythonData.teamBName || "Team B",
-    teamAScore: pythonData.score?.team_a || pythonData.teamAScore || 0,
-    teamBScore: pythonData.score?.team_b || pythonData.teamBScore || 0,
-    players: pythonData.players || [],
-    fraudAssessments: pythonData.fraudAssessments || [],
-    totalEventsProcessed: pythonData.events?.length || 0,
-  };
-}
 
 // Multer error handler
 const multerErrorHandler = (err: any, _req: Request, res: Response, next: NextFunction) => {
@@ -140,7 +158,6 @@ const analyzeDemo = async (req: Request, res: Response) => {
 
     const analyzer = new DemoAnalyzer(fullPath);
     const analysis = await analyzer.analyze();
-
     return res.json({ success: true, analysis });
   } catch (err) {
     console.error("Analysis error:", err);
@@ -148,7 +165,7 @@ const analyzeDemo = async (req: Request, res: Response) => {
   }
 };
 
-// Analysis status
+// Status route
 const getAnalysisStatus = async (req: Request, res: Response) => {
   try {
     const { fileName } = req.params;
