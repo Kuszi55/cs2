@@ -144,8 +144,6 @@ export class DemoAnalyzer {
 
     // Generate player analysis with consistent, realistic data
     const players: PlayerAnalysis[] = [];
-    const teamAPlayers: PlayerAnalysis[] = [];
-    const teamBPlayers: PlayerAnalysis[] = [];
 
     // Realistic player names (would be extracted from demo in production)
     const playerNames = [
@@ -170,12 +168,14 @@ export class DemoAnalyzer {
       const team = i < playerCount / 2 ? "Counter-Terrorists" : "Terrorists";
       const baseKills = Math.floor(Math.random() * 18) + 8;
       const baseDeaths = Math.floor(Math.random() * 12) + 4;
+      const baseHeadshots = Math.floor(baseKills * (Math.random() * 0.35 + 0.15));
+      const baseDamage = Math.floor(Math.random() * 2500) + 600;
 
       const player: PlayerAnalysis = {
         name:
           playerNames[i % playerNames.length] +
-          (i > playerNames.length
-            ? ` #${Math.floor(i / playerNames.length)}`
+          (i >= playerNames.length
+            ? ` #${Math.floor(i / playerNames.length) + 1}`
             : ""),
         steamId: `${Math.floor(Math.random() * 9000000000000000) + 1000000000000000}`,
         team,
@@ -183,10 +183,10 @@ export class DemoAnalyzer {
         deaths: baseDeaths,
         assists: Math.floor(Math.random() * 12) + 2,
         accuracy: Math.random() * 0.45 + 0.25,
-        headshots: Math.floor(baseKills * (Math.random() * 0.35 + 0.15)),
-        hsPercent: Math.random() * 40 + 10,
-        totalDamage: Math.floor(Math.random() * 2500) + 600,
-        avgDamage: Math.floor(Math.random() * 70) + 30,
+        headshots: baseHeadshots,
+        hsPercent: baseHeadshots > 0 ? (baseHeadshots / baseKills) * 100 : 0,
+        totalDamage: baseDamage,
+        avgDamage: Math.floor(baseDamage / (baseKills + baseDeaths)),
         kdRatio: baseKills / Math.max(baseDeaths, 1),
         plants: gameMode === "5v5" ? Math.floor(Math.random() * 4) : 0,
         defuses: gameMode === "5v5" ? Math.floor(Math.random() * 3) : 0,
@@ -195,11 +195,6 @@ export class DemoAnalyzer {
       };
 
       players.push(player);
-      if (team === "Counter-Terrorists") {
-        teamAPlayers.push(player);
-      } else {
-        teamBPlayers.push(player);
-      }
     }
 
     // Generate balanced scores
@@ -325,15 +320,16 @@ export class DemoAnalyzer {
     else if (fraudProbability >= 60) riskLevel = "high";
     else if (fraudProbability >= 30) riskLevel = "medium";
 
+    // ✅ KLUCZOWA ZMIANA: Dodano fallbacki || 0
     return {
-      playerName: player.name,
-      fraudProbability: Math.round(fraudProbability * 100) / 100,
-      aimScore: Math.round(aimScore * 100) / 100,
-      positioningScore: Math.round(positioningScore * 100) / 100,
-      reactionScore: Math.round(reactionScore * 100) / 100,
-      gameSenseScore: Math.round(gameSenseScore * 100) / 100,
-      consistencyScore: Math.round(consistencyScore * 100) / 100,
-      suspiciousActivities,
+      playerName: player.name || "Unknown",
+      fraudProbability: Math.round((fraudProbability || 0) * 100) / 100,
+      aimScore: Math.round((aimScore || 0) * 100) / 100,
+      positioningScore: Math.round((positioningScore || 0) * 100) / 100,
+      reactionScore: Math.round((reactionScore || 0) * 100) / 100,
+      gameSenseScore: Math.round((gameSenseScore || 0) * 100) / 100,
+      consistencyScore: Math.round((consistencyScore || 0) * 100) / 100,
+      suspiciousActivities: suspiciousActivities || [],
       riskLevel,
     };
   }
@@ -468,11 +464,11 @@ export class DemoAnalyzer {
     };
 
     let baseProbability =
-      aimScore * weights.aim +
-      positioningScore * weights.positioning +
-      reactionScore * weights.reaction +
-      gameSenseScore * weights.gameSense +
-      consistencyScore * weights.consistency;
+      (aimScore || 0) * weights.aim +
+      (positioningScore || 0) * weights.positioning +
+      (reactionScore || 0) * weights.reaction +
+      (gameSenseScore || 0) * weights.gameSense +
+      (consistencyScore || 0) * weights.consistency;
 
     const activityBonus = Math.min(suspiciousActivityCount * 5, 20);
     baseProbability = Math.min(baseProbability + activityBonus / 100, 1);
