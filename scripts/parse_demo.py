@@ -47,16 +47,40 @@ try:
 
     try:
         parsed = json.loads(out)
-        # ✅ Tutaj łączymy dane (żeby frontend miał bezpośredni dostęp do pól jak 'players', 'map', itd.)
+        
+        # ✅ KLUCZOWA ZMIANA: Zawsze zwracaj strukturę z 'analysis'
         result = {
-            **parsed,  # wkleja dane z cs2json
             "success": True,
+            "analysis": {
+                "mapName": parsed.get("map", "Unknown"),
+                "gameMode": parsed.get("gameMode", "5v5"),
+                "teamAName": "Team A",
+                "teamBName": "Team B", 
+                "teamAScore": parsed.get("teamAScore", 0),
+                "teamBScore": parsed.get("teamBScore", 0),
+                "duration": 0,
+                "players": parsed.get("players", []),
+                "fraudAssessments": [],
+                "totalEventsProcessed": 0
+            },
             "sourceFile": os.path.basename(demo_path),
         }
+        
+        # ✅ Sprawdź czy wymagane pola istnieją
+        if not result["analysis"]["mapName"]:
+            result["analysis"]["mapName"] = "Unknown"
+        if not result["analysis"]["gameMode"]:
+            result["analysis"]["gameMode"] = "5v5"
+            
         print(json.dumps(result))
 
-    except Exception:
-        print(json.dumps({"success": True, "raw": out}))
+    except Exception as e:
+        log(f"JSON parse error: {str(e)}")
+        print(json.dumps({
+            "success": False, 
+            "error": f"Failed to parse cs2json output: {str(e)}"
+        }))
+        sys.exit(1)
 
 except subprocess.TimeoutExpired:
     msg = "cs2json timeout after 120s"
