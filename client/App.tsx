@@ -16,6 +16,7 @@ import MatchesHistory from "./pages/MatchesHistory";
 import MatchDetails from "./pages/MatchDetails";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import AnalyzeDemo from "./pages/AnalyzeDemo"; // ⬅️ nowy import
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,13 @@ const AppRoutes = () => (
       path="/settings"
       element={<ProtectedRoute element={<Settings />} />}
     />
+
+    {/* ⬇️ Nowa trasa AnalyzeDemo */}
+    <Route
+      path="/analyze-demo"
+      element={<ProtectedRoute element={<AnalyzeDemo />} />}
+    />
+
     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
     <Route path="*" element={<NotFound />} />
   </Routes>
