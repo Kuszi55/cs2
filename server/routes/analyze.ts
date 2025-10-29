@@ -98,7 +98,7 @@ const uploadAndAnalyze = async (req: Request, res: Response) => {
     try {
       const savedMatch = MatchService.saveMatch({ demoFileName: req.file.originalname, ...analysis });
       console.log("✅ Saved match:", savedMatch.id);
-      return res.json({ success: true, matchId: savedMatch.id, metadata, analysis });
+      return res.json({ success: true, ...analysis, matchId: savedMatch.id, metadata });
     } catch (dbErr) {
       console.warn("⚠️ Failed to save match:", dbErr);
       return res.json({ success: true, metadata, analysis, warning: "Failed to save DB" });
