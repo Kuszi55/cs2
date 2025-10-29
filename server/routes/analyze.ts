@@ -15,11 +15,11 @@ import { MatchService } from "../services/matchService";
 const execFileAsync = promisify(execFile);
 const router = Router();
 
-// Uploads directory
+// 🔹 Folder uploadów
 const uploadsDir = path.join(process.cwd(), "dist/spa/uploads");
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
-// Multer storage
+// 🔹 Multer konfiguracja
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, uploadsDir),
   filename: (_req, file, cb) => {
@@ -28,36 +28,31 @@ const storage = multer.diskStorage({
   },
 });
 
-// Multer upload config
 const upload = multer({
   storage,
   fileFilter: (_req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
-    cb(ext === ".dem", ext === ".dem" ? null : new Error("Only .dem files are supported"));
+    console.log("File filter check:", file.originalname, "ext:", ext);
+    if (ext !== ".dem") {
+      console.error("❌ Rejected file:", file.originalname);
+      return cb(new Error("Only .dem files are supported"));
+    }
+    cb(null, true);
   },
   limits: { fileSize: 1024 * 1024 * 1024 }, // 1GB
 });
 
-// Transform Go/Python output to unified format
-function transformOutput(data: any) {
-  return {
-    mapName: data.map || "Unknown",
-    gameMode: data.gameMode || "5v5",
-    duration: data.duration || 0,
-    teamAName: data.teamAName || "Team A",
-    teamBName: data.teamBName || "Team B",
-    teamAScore: data.score?.team_a || data.teamAScore || 0,
-    teamBScore: data.score?.team_b || data.teamBScore || 0,
-    players: data.players || [],
-    fraudAssessments: data.fraudAssessments || [],
-    totalEventsProcessed: data.events?.length || 0,
-  };
-}
-
-// Upload & analyze
+// 🔹 Funkcja upload + analiza
 const uploadAndAnalyze = async (req: Request, res: Response) => {
+  console.log("===== FILE UPLOAD REQUEST =====");
+  console.log("Body:", req.body);
+  console.log("File:", req.file);
+
   try {
-    if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+    if (!req.file) {
+      console.error("❌ No file detected in request!");
+      return res.status(400).json({ error: "No file uploaded" });
+    }
 
     const filePath = req.file.path;
     console.log("Upload received:", {
@@ -68,6 +63,7 @@ const uploadAndAnalyze = async (req: Request, res: Response) => {
     });
 
     if (!isValidDemoFile(filePath)) {
+      console.error("❌ Invalid demo file format:", filePath);
       try { fs.unlinkSync(filePath); } catch {}
       return res.status(400).json({ error: "Invalid demo file format" });
     }
@@ -77,114 +73,55 @@ const uploadAndAnalyze = async (req: Request, res: Response) => {
 
     let analysis: any;
 
-    // Try Python first
+    // 🔹 Próbujemy python3 → cs2json → JS fallback
     try {
       const pythonScript = "/var/www/cs2-analysis/scripts/parse_demo.py";
-      console.log("Calling Python on:", filePath);
-
       const { stdout, stderr } = await execFileAsync("python3", [pythonScript, filePath], {
-        timeout: 60000,
-        maxBuffer: 10 * 1024 * 1024,
+        timeout: 120000,
+        maxBuffer: 20 * 1024 * 1024,
       });
 
-      if (stderr) console.warn("Python script stderr:", stderr);
+      if (stderr) console.warn("Python stderr:", stderr);
+      console.log("Python stdout:", stdout.slice(0, 500));
 
       const pythonOutput = JSON.parse(stdout);
       if (!pythonOutput.success) throw new Error(pythonOutput.error || "Python script failed");
 
-      analysis = transformOutput(pythonOutput);
-      console.log("Python analysis successful for:", req.file.originalname);
+      analysis = pythonOutput;
+      console.log("✅ Python analysis success:", req.file.originalname);
     } catch (pyErr) {
-      console.warn("Python failed, using Go parser:", pyErr);
-
-      try {
-        const goParser = "/var/www/cs2-analysis/scripts/cs2json";
-        console.log("Calling Go parser on:", filePath);
-
-        const { stdout, stderr } = await execFileAsync(goParser, [filePath], {
-          timeout: 60000,
-          maxBuffer: 10 * 1024 * 1024,
-        });
-
-        if (stderr) console.warn("Go parser stderr:", stderr);
-
-        const goOutput = JSON.parse(stdout);
-        if (!goOutput.success) throw new Error(goOutput.error || "Go parser failed");
-
-        analysis = transformOutput(goOutput);
-        console.log("Go parser analysis successful for:", req.file.originalname);
-      } catch (goErr) {
-        console.error("Go parser failed too:", goErr);
-        // Fallback JS analyzer as last resort
-        const analyzer = new DemoAnalyzer(filePath);
-        analysis = await analyzer.analyze();
-        console.log("Fallback JS analyzer used for:", req.file.originalname);
-      }
+      console.warn("⚠️ Python failed, fallback to JS:", pyErr);
+      const analyzer = new DemoAnalyzer(filePath);
+      analysis = await analyzer.analyze();
     }
 
-    // Save match
     try {
       const savedMatch = MatchService.saveMatch({ demoFileName: req.file.originalname, ...analysis });
-      return res.json({ success: true, matchId: savedMatch.id, metadata, analysis, uploadedFilePath: req.file.filename });
+      console.log("✅ Saved match:", savedMatch.id);
+      return res.json({ success: true, matchId: savedMatch.id, metadata, analysis });
     } catch (dbErr) {
-      console.warn("Failed to save match:", dbErr);
-      return res.json({ success: true, metadata, analysis, uploadedFilePath: req.file.filename, warning: "Failed to save to DB" });
+      console.warn("⚠️ Failed to save match:", dbErr);
+      return res.json({ success: true, metadata, analysis, warning: "Failed to save DB" });
     }
   } catch (err) {
+    console.error("🔥 Upload/analysis error:", err);
     if (req.file) try { fs.unlinkSync(req.file.path); } catch {}
-    console.error("Upload/analysis error:", err);
-    return res.status(500).json({ error: "Failed to analyze demo file: " + (err as Error).message });
+    return res.status(500).json({ error: "Failed to analyze demo: " + (err as Error).message });
   }
 };
 
-// Multer error handler
+// 🔹 Błąd z Multer
 const multerErrorHandler = (err: any, _req: Request, res: Response, next: NextFunction) => {
+  console.error("💥 Multer upload error:", err);
   if (err instanceof MulterError) {
-    console.error("Multer error:", err);
     if (err.code === "LIMIT_FILE_SIZE") return res.status(413).json({ error: "File too large. Max 1GB." });
     return res.status(400).json({ error: err.message });
   } else if (err) {
-    console.error("Upload error:", err);
     return res.status(400).json({ error: err.message });
   }
   next();
 };
 
-// Analyze existing demo file
-const analyzeDemo = async (req: Request, res: Response) => {
-  try {
-    const { filePath } = req.body;
-    if (!filePath) return res.status(400).json({ error: "No file path provided" });
-
-    const fullPath = path.join(uploadsDir, filePath);
-    if (!fs.existsSync(fullPath)) return res.status(404).json({ error: "File not found" });
-    if (!isValidDemoFile(fullPath)) return res.status(400).json({ error: "Invalid demo file format" });
-
-    const analyzer = new DemoAnalyzer(fullPath);
-    const analysis = await analyzer.analyze();
-    return res.json({ success: true, analysis });
-  } catch (err) {
-    console.error("Analysis error:", err);
-    return res.status(500).json({ error: "Failed to analyze demo: " + (err as Error).message });
-  }
-};
-
-// Status route
-const getAnalysisStatus = async (req: Request, res: Response) => {
-  try {
-    const { fileName } = req.params;
-    const filePath = path.join(uploadsDir, fileName);
-    if (!fs.existsSync(filePath)) return res.status(404).json({ error: "File not found" });
-
-    return res.json({ status: "completed", progress: 100, fileName, completedAt: new Date() });
-  } catch (err) {
-    return res.status(500).json({ error: "Failed to get status: " + (err as Error).message });
-  }
-};
-
-// Routes
+// 🔹 Endpointy
 router.post("/upload", upload.single("file"), multerErrorHandler, uploadAndAnalyze);
-router.post("/", analyzeDemo);
-router.get("/status/:fileName", getAnalysisStatus);
-
 export default router;
