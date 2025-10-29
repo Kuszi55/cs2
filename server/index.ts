@@ -4,6 +4,7 @@ import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import analyzeRouter from "./routes/analyze";
 import matchesRouter from "./routes/matches";
+import { handleAnalyzeDemo } from "./routes/analyze-demo"; // ⬅️ nowy import
 
 export function createServer() {
   const app = express();
@@ -20,6 +21,9 @@ export function createServer() {
   });
 
   app.get("/api/demo", handleDemo);
+
+  // ⬇️ Nowy endpoint POST
+  app.post("/api/analyze-demo", handleAnalyzeDemo);
 
   // Demo analysis routes
   app.use("/api/analyze", analyzeRouter);
