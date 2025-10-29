@@ -1,41 +1,51 @@
 import { RequestHandler } from "express";
-import { spawn } from "child_process";
+import multer from "multer";
 import { DemoAnalysisResponse } from "@shared/api";
+import { spawn } from "child_process";
 import path from "path";
 import fs from "fs";
 
-export const handleAnalyzeDemo: RequestHandler = (req, res) => {
-  const demoFile = req.file; // Zakładamy upload za pomocą multer
-  if (!demoFile) {
-    return res.status(400).json({ success: false, error: "No file uploaded" });
-  }
+// Multer config (temp .dem upload)
+const upload = multer({ dest: "/tmp" });
 
-  const scriptPath = path.resolve(__dirname, "../../scripts/parse_demo.py");
-  const python = spawn("python3", [scriptPath, demoFile.path]);
-
-  let scriptOutput = "";
-  let scriptError = "";
-
-  python.stdout.on("data", (data) => {
-    scriptOutput += data.toString();
-  });
-
-  python.stderr.on("data", (data) => {
-    scriptError += data.toString();
-  });
-
-  python.on("close", (code) => {
-    fs.unlinkSync(demoFile.path); // Usuwamy plik tymczasowy po analizie
-
-    if (code !== 0) {
-      return res.status(500).json({ success: false, error: scriptError || "Analysis failed" });
+export const handleAnalyzeDemo: RequestHandler[] = [
+  upload.single("demo"),
+  async (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: "No file uploaded" });
     }
 
-    try {
-      const parsed: DemoAnalysisResponse = JSON.parse(scriptOutput);
-      res.json(parsed);
-    } catch (err) {
-      res.status(500).json({ success: false, error: "Failed to parse Python output" });
-    }
-  });
-};
+    const demoPath = req.file.path;
+    const analyzerPath = path.resolve(
+      __dirname,
+      "../../../scripts/demoinfocs-golang/examples/cs2json"
+    );
+
+    // Wywołanie analizatora Go
+    const proc = spawn(analyzerPath, [demoPath]);
+    let data = "";
+    let errData = "";
+
+    proc.stdout.on("data", (chunk) => (data += chunk));
+    proc.stderr.on("data", (chunk) => (errData += chunk));
+
+    proc.on("close", (code) => {
+      fs.unlinkSync(demoPath); // czyść po sobie!
+      if (code !== 0) {
+        return res.status(500).json({
+          success: false,
+          error: "Analyzer failed: " + errData,
+        });
+      }
+      try {
+        const parsed: DemoAnalysisResponse = JSON.parse(data);
+        res.json(parsed);
+      } catch (e) {
+        res.status(500).json({
+          success: false,
+          error: "Failed to parse analyzer output: " + String(e),
+        });
+      }
+    });
+  },
+];
