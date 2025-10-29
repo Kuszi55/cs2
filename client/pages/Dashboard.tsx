@@ -111,8 +111,53 @@ export default function Dashboard() {
           try {
             setUploadProgress(75);
             const response = JSON.parse(xhr.responseText);
+            
+            // ✅ KLUCZOWA NAPRAWA: Sprawdź czy response istnieje
+            if (!response) {
+              setIsAnalyzing(false);
+              toast({
+                title: "Błąd",
+                description: "Serwer zwrócił pustą odpowiedź",
+                variant: "destructive",
+              });
+              return;
+            }
+
+            // ✅ Sprawdź czy to błąd z success: false
+            if (response.success === false) {
+              setIsAnalyzing(false);
+              toast({
+                title: "Analiza nie powiodła się",
+                description: response.error || "Nieznany błąd",
+                variant: "destructive",
+              });
+              return;
+            }
+
+            // ✅ Sprawdź czy analysis istnieje
+            if (!response.analysis) {
+              setIsAnalyzing(false);
+              toast({
+                title: "Błąd struktury danych",
+                description: "Brak pola 'analysis' w odpowiedzi serwera",
+                variant: "destructive",
+              });
+              return;
+            }
+
             const result: AnalysisResult = response.analysis;
             const matchId = response.matchId;
+
+            // ✅ Sprawdź czy result ma wymagane pola
+            if (!result.gameMode || !result.mapName) {
+              setIsAnalyzing(false);
+              toast({
+                title: "Niepełne dane",
+                description: "Brak gameMode lub mapName w wynikach analizy",
+                variant: "destructive",
+              });
+              return;
+            }
 
             setAnalysisResult(result);
             setGameMode(result.gameMode);
@@ -128,28 +173,37 @@ export default function Dashboard() {
             console.error("Parse error:", error);
             setIsAnalyzing(false);
             toast({
-              title: "Błąd",
-              description: "Nie udało się sparsować wyników analizy",
+              title: "Błąd parsowania",
+              description: "Nie udało się sparsować odpowiedzi JSON",
               variant: "destructive",
             });
           }
         } else {
-          const errorResponse = JSON.parse(xhr.responseText);
-          setIsAnalyzing(false);
-          toast({
-            title: "Analiza nie powiodła się",
-            description:
-              errorResponse.error || "Nie udało się przeanalizować dema",
-            variant: "destructive",
-          });
+          // ✅ Obsługa błędów HTTP
+          try {
+            const errorResponse = JSON.parse(xhr.responseText);
+            setIsAnalyzing(false);
+            toast({
+              title: "Błąd serwera",
+              description: errorResponse.error || `Błąd HTTP ${xhr.status}`,
+              variant: "destructive",
+            });
+          } catch {
+            setIsAnalyzing(false);
+            toast({
+              title: "Błąd serwera",
+              description: `Kod błędu: ${xhr.status}`,
+              variant: "destructive",
+            });
+          }
         }
       });
 
       xhr.addEventListener("error", () => {
         setIsAnalyzing(false);
         toast({
-          title: "Wgranie nie powiodło się",
-          description: "Błąd sieciowy podczas wgrania",
+          title: "Błąd sieci",
+          description: "Nie udało się połączyć z serwerem",
           variant: "destructive",
         });
       });
