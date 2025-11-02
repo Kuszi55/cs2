@@ -18,7 +18,6 @@ import {
   Loader2,
   ArrowLeft,
   TrendingUp,
-  Tabs as TabsIcon,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -140,36 +139,34 @@ export default function MatchDetails() {
         {/* Tabs Navigation */}
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="grid w-full grid-cols-7 bg-slate-900/50 border border-slate-700">
-            <TabsTrigger value="overview" className="text-sm">
+            <TabsTrigger value="overview" className="text-xs sm:text-sm">
               Overview
             </TabsTrigger>
-            <TabsTrigger value="details" className="text-sm">
-              Match Details
+            <TabsTrigger value="details" className="text-xs sm:text-sm">
+              Details
             </TabsTrigger>
-            <TabsTrigger value="h2h" className="text-sm">
-              Head to Head
+            <TabsTrigger value="h2h" className="text-xs sm:text-sm">
+              H2H
             </TabsTrigger>
-            <TabsTrigger value="rating" className="text-sm">
-              Rating Breakdown
+            <TabsTrigger value="rating" className="text-xs sm:text-sm">
+              Rating
             </TabsTrigger>
-            <TabsTrigger value="zones" className="text-sm">
-              Map Zones
+            <TabsTrigger value="zones" className="text-xs sm:text-sm">
+              Zones
             </TabsTrigger>
-            <TabsTrigger value="players" className="text-sm">
-              Check Players
+            <TabsTrigger value="players" className="text-xs sm:text-sm">
+              Players
             </TabsTrigger>
-            <TabsTrigger value="clips" className="text-sm">
-              Podejrzane klipy
+            <TabsTrigger value="clips" className="text-xs sm:text-sm">
+              Klipy
             </TabsTrigger>
           </TabsList>
 
-          {/* ===== OVERVIEW TAB ===== */}
+          {/* OVERVIEW TAB */}
           <TabsContent value="overview" className="space-y-6 mt-6">
-            {/* Match Score Card */}
             <Card className="border-slate-700 bg-gradient-to-br from-slate-900/50 to-slate-800/50 backdrop-blur">
               <CardContent className="py-8">
                 <div className="flex items-center justify-between gap-8">
-                  {/* Team A */}
                   <div className="text-center">
                     <p className="text-slate-400 text-sm font-medium mb-2">
                       {match.teamAName}
@@ -186,7 +183,6 @@ export default function MatchDetails() {
                     </p>
                   </div>
 
-                  {/* Winner Badge */}
                   <div className="text-center">
                     <Trophy className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
                     <p className="text-slate-400 text-sm font-medium">
@@ -194,7 +190,6 @@ export default function MatchDetails() {
                     </p>
                   </div>
 
-                  {/* Team B */}
                   <div className="text-center">
                     <p className="text-slate-400 text-sm font-medium mb-2">
                       {match.teamBName}
@@ -214,7 +209,6 @@ export default function MatchDetails() {
               </CardContent>
             </Card>
 
-            {/* Team Statistics */}
             {stats && (
               <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
                 <CardHeader>
@@ -237,7 +231,6 @@ export default function MatchDetails() {
                           <p className="text-white font-bold text-lg">
                             {teamName}
                           </p>
-
                           <div className="grid grid-cols-2 gap-3 text-sm">
                             <div>
                               <p className="text-slate-400 text-xs mb-1">
@@ -309,7 +302,7 @@ export default function MatchDetails() {
             )}
           </TabsContent>
 
-          {/* ===== MATCH DETAILS TAB ===== */}
+          {/* MATCH DETAILS TAB */}
           <TabsContent value="details" className="space-y-6 mt-6">
             <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
               <CardHeader>
@@ -337,7 +330,6 @@ export default function MatchDetails() {
               </CardContent>
             </Card>
 
-            {/* Player Performance Table */}
             <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
@@ -354,13 +346,13 @@ export default function MatchDetails() {
                           Player
                         </th>
                         <th className="text-center py-3 px-4 text-slate-400 font-medium">
-                          Kills
+                          K
                         </th>
                         <th className="text-center py-3 px-4 text-slate-400 font-medium">
-                          Deaths
+                          D
                         </th>
                         <th className="text-center py-3 px-4 text-slate-400 font-medium">
-                          Assists
+                          A
                         </th>
                         <th className="text-center py-3 px-4 text-slate-400 font-medium">
                           K/D
@@ -422,7 +414,7 @@ export default function MatchDetails() {
             </Card>
           </TabsContent>
 
-          {/* ===== HEAD TO HEAD TAB ===== */}
+          {/* HEAD TO HEAD TAB */}
           <TabsContent value="h2h" className="space-y-6 mt-6">
             <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
               <CardHeader>
@@ -517,13 +509,13 @@ export default function MatchDetails() {
             </Card>
           </TabsContent>
 
-          {/* ===== RATING BREAKDOWN TAB ===== */}
+          {/* RATING BREAKDOWN TAB */}
           <TabsContent value="rating" className="space-y-6 mt-6">
             <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-blue-400" />
-                  Rating Breakdown by Player
+                  Rating Breakdown
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -541,10 +533,10 @@ export default function MatchDetails() {
                           Aim
                         </th>
                         <th className="text-center py-3 px-4 text-slate-400 font-medium">
-                          Positioning
+                          Pos
                         </th>
                         <th className="text-center py-3 px-4 text-slate-400 font-medium">
-                          Game Sense
+                          GS
                         </th>
                       </tr>
                     </thead>
@@ -583,7 +575,7 @@ export default function MatchDetails() {
             </Card>
           </TabsContent>
 
-          {/* ===== MAP ZONES TAB ===== */}
+          {/* MAP ZONES TAB */}
           <TabsContent value="zones" className="space-y-6 mt-6">
             <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
               <CardContent className="py-12 text-center">
@@ -595,10 +587,9 @@ export default function MatchDetails() {
             </Card>
           </TabsContent>
 
-          {/* ===== CHECK PLAYERS TAB ===== */}
+          {/* CHECK PLAYERS TAB */}
           <TabsContent value="players" className="space-y-6 mt-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Player Selection */}
               <Card className="border-slate-700 bg-slate-900/50 backdrop-blur lg:col-span-1">
                 <CardHeader>
                   <CardTitle className="text-white text-sm">Players</CardTitle>
@@ -614,18 +605,16 @@ export default function MatchDetails() {
                           : "bg-slate-800/50 text-slate-300 hover:bg-slate-800"
                       }`}
                     >
-                      <p className="font-medium">{player.name}</p>
+                      <p className="font-medium text-sm">{player.name}</p>
                       <p className="text-xs opacity-80">{player.kills} kills</p>
                     </button>
                   ))}
                 </CardContent>
               </Card>
 
-              {/* Player Details */}
               <div className="lg:col-span-2 space-y-6">
-                {selectedPlayerData && selectedPlayerFraud && (
+                {selectedPlayerData && selectedPlayerFraud ? (
                   <>
-                    {/* Player Header */}
                     <Card className="border-slate-700 bg-gradient-to-br from-blue-500/20 to-slate-900/50 backdrop-blur">
                       <CardContent className="py-6">
                         <div className="flex justify-between items-start mb-4">
@@ -698,7 +687,6 @@ export default function MatchDetails() {
                       </CardContent>
                     </Card>
 
-                    {/* Detailed Stats */}
                     <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
                       <CardHeader>
                         <CardTitle className="text-white text-sm">
@@ -759,7 +747,6 @@ export default function MatchDetails() {
                       </CardContent>
                     </Card>
 
-                    {/* Fraud Assessment */}
                     <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
                       <CardHeader>
                         <CardTitle className="text-white text-sm flex items-center gap-2">
@@ -787,7 +774,7 @@ export default function MatchDetails() {
                           </div>
                           <div className="bg-slate-800/50 rounded-lg p-3">
                             <p className="text-slate-400 text-xs mb-1">
-                              Reaction Time
+                              Reaction
                             </p>
                             <p className="text-white font-bold">
                               {selectedPlayerFraud.reactionScore.toFixed(1)}
@@ -803,29 +790,28 @@ export default function MatchDetails() {
                           </div>
                         </div>
 
-                        {selectedPlayerFraud.suspiciousActivities &&
-                          selectedPlayerFraud.suspiciousActivities.length > 0 && (
-                            <div className="space-y-2 mt-4 pt-4 border-t border-slate-700">
-                              <p className="text-white font-medium text-sm">
-                                Suspicious Indicators:
-                              </p>
-                              {selectedPlayerFraud.suspiciousActivities.map(
-                                (activity: any, idx: number) => (
-                                  <div
-                                    key={idx}
-                                    className="bg-red-500/10 border border-red-500/30 rounded-lg p-2 text-sm"
-                                  >
-                                    <p className="text-red-300 font-medium">
-                                      {activity.description}
-                                    </p>
-                                    <p className="text-red-400 text-xs">
-                                      Confidence: {activity.confidence.toFixed(1)}%
-                                    </p>
-                                  </div>
-                                ),
-                              )}
-                            </div>
-                          )}
+                        {selectedPlayerFraud.suspiciousActivities?.length > 0 && (
+                          <div className="space-y-2 mt-4 pt-4 border-t border-slate-700">
+                            <p className="text-white font-medium text-sm">
+                              Suspicious Indicators:
+                            </p>
+                            {selectedPlayerFraud.suspiciousActivities.map(
+                              (activity: any, idx: number) => (
+                                <div
+                                  key={idx}
+                                  className="bg-red-500/10 border border-red-500/30 rounded-lg p-2 text-sm"
+                                >
+                                  <p className="text-red-300 font-medium">
+                                    {activity.description}
+                                  </p>
+                                  <p className="text-red-400 text-xs">
+                                    Confidence: {activity.confidence.toFixed(1)}%
+                                  </p>
+                                </div>
+                              ),
+                            )}
+                          </div>
+                        )}
 
                         <div
                           className={`mt-4 p-3 rounded-lg text-sm font-medium ${
@@ -856,7 +842,7 @@ export default function MatchDetails() {
             </div>
           </TabsContent>
 
-          {/* ===== PODEJRZANE KLIPY TAB ===== */}
+          {/* PODEJRZANE KLIPY TAB */}
           <TabsContent value="clips" className="space-y-6 mt-6">
             <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
               <CardContent className="py-12 text-center">
