@@ -171,9 +171,6 @@ const uploadAndAnalyze: RequestHandler = async (req, res) => {
 };
 
 /**
- * Error handler for multer
- */
-/**
  * Transform Python script output to MatchService format
  * Handles the new parse_demo.py structure with "analysis" wrapper
  */
