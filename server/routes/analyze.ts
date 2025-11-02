@@ -51,9 +51,9 @@ const uploadAndAnalyze = async (req: Request, res: Response) => {
   try {
     if (!req.file) {
       console.error("❌ No file detected in request!");
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        error: "No file uploaded" 
+        error: "No file uploaded",
       });
     }
 
@@ -67,10 +67,12 @@ const uploadAndAnalyze = async (req: Request, res: Response) => {
 
     if (!isValidDemoFile(filePath)) {
       console.error("❌ Invalid demo file format:", filePath);
-      try { fs.unlinkSync(filePath); } catch {}
-      return res.status(400).json({ 
+      try {
+        fs.unlinkSync(filePath);
+      } catch {}
+      return res.status(400).json({
         success: false,
-        error: "Invalid demo file format" 
+        error: "Invalid demo file format",
       });
     }
 
@@ -82,16 +84,20 @@ const uploadAndAnalyze = async (req: Request, res: Response) => {
     // 🔹 Próbujemy python3 → fallback JS
     try {
       const pythonScript = "/var/www/cs2-analysis/scripts/parse_demo.py";
-      const { stdout, stderr } = await execFileAsync("python3", [pythonScript, filePath], {
-        timeout: 120000,
-        maxBuffer: 20 * 1024 * 1024,
-      });
+      const { stdout, stderr } = await execFileAsync(
+        "python3",
+        [pythonScript, filePath],
+        {
+          timeout: 120000,
+          maxBuffer: 20 * 1024 * 1024,
+        },
+      );
 
       if (stderr) console.warn("Python stderr:", stderr);
       console.log("Python stdout:", stdout.slice(0, 500));
 
       const pythonOutput = JSON.parse(stdout);
-      
+
       // ✅ Sprawdź czy Python zwrócił błąd
       if (!pythonOutput.success) {
         throw new Error(pythonOutput.error || "Python script failed");
@@ -115,74 +121,84 @@ const uploadAndAnalyze = async (req: Request, res: Response) => {
       console.error("❌ Analysis missing required fields:", analysis);
       return res.status(500).json({
         success: false,
-        error: "Analysis incomplete: missing mapName or gameMode"
+        error: "Analysis incomplete: missing mapName or gameMode",
       });
     }
 
     try {
-      const savedMatch = MatchService.saveMatch({ 
-        demoFileName: req.file.originalname, 
-        ...analysis 
+      const savedMatch = MatchService.saveMatch({
+        demoFileName: req.file.originalname,
+        ...analysis,
       });
-      
+
       console.log("✅ Saved match:", savedMatch.id);
-      
+
       // ✅ POPRAWIONA STRUKTURA ODPOWIEDZI
-      return res.json({ 
-        success: true, 
-        analysis,  // ← Zawsze w polu 'analysis'
-        matchId: savedMatch.id, 
-        metadata 
+      return res.json({
+        success: true,
+        analysis, // ← Zawsze w polu 'analysis'
+        matchId: savedMatch.id,
+        metadata,
       });
     } catch (dbErr) {
       console.warn("⚠️ Failed to save match:", dbErr);
-      
+
       // ✅ Nawet przy błędzie DB zwracamy analysis
-      return res.json({ 
-        success: true, 
+      return res.json({
+        success: true,
         analysis,
-        metadata, 
-        warning: "Failed to save to database" 
+        metadata,
+        warning: "Failed to save to database",
       });
     }
   } catch (err) {
     console.error("🔥 Upload/analysis error:", err);
     if (req.file) {
-      try { 
-        fs.unlinkSync(req.file.path); 
+      try {
+        fs.unlinkSync(req.file.path);
       } catch {}
     }
-    
-    return res.status(500).json({ 
+
+    return res.status(500).json({
       success: false,
-      error: "Failed to analyze demo: " + (err as Error).message 
+      error: "Failed to analyze demo: " + (err as Error).message,
     });
   }
 };
 
 // 🔹 Błąd z Multer
-const multerErrorHandler = (err: any, _req: Request, res: Response, next: NextFunction) => {
+const multerErrorHandler = (
+  err: any,
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   console.error("💥 Multer upload error:", err);
   if (err instanceof MulterError) {
     if (err.code === "LIMIT_FILE_SIZE") {
       return res.status(413).json({
         success: false,
-        error: "File too large. Max 1GB."
+        error: "File too large. Max 1GB.",
       });
     }
     return res.status(400).json({
       success: false,
-      error: err.message
+      error: err.message,
     });
   } else if (err) {
     return res.status(400).json({
       success: false,
-      error: err.message
+      error: err.message,
     });
   }
   next();
 };
 
 // 🔹 Endpointy
-router.post("/upload", upload.single("file"), multerErrorHandler, uploadAndAnalyze);
+router.post(
+  "/upload",
+  upload.single("file"),
+  multerErrorHandler,
+  uploadAndAnalyze,
+);
 export default router;
