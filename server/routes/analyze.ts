@@ -175,19 +175,23 @@ const uploadAndAnalyze: RequestHandler = async (req, res) => {
  */
 /**
  * Transform Python script output to MatchService format
+ * Handles the new parse_demo.py structure with "analysis" wrapper
  */
 function transformPythonOutput(pythonData: any): any {
+  // Handle new Python script output format with "analysis" key
+  const analysisData = pythonData.analysis || pythonData;
+
   return {
-    mapName: pythonData.map || "Unknown",
-    gameMode: pythonData.gameMode || "5v5",
-    duration: pythonData.duration || 0,
-    teamAName: pythonData.teamAName || "Team A",
-    teamBName: pythonData.teamBName || "Team B",
-    teamAScore: pythonData.score?.team_a || pythonData.teamAScore || 0,
-    teamBScore: pythonData.score?.team_b || pythonData.teamBScore || 0,
-    players: pythonData.players || [],
-    fraudAssessments: pythonData.fraudAssessments || [],
-    totalEventsProcessed: pythonData.events?.length || 0,
+    mapName: analysisData.mapName || "Unknown",
+    gameMode: analysisData.gameMode || "5v5",
+    duration: analysisData.duration || 0,
+    teamAName: analysisData.teamAName || "Team A",
+    teamBName: analysisData.teamBName || "Team B",
+    teamAScore: analysisData.teamAScore || 0,
+    teamBScore: analysisData.teamBScore || 0,
+    players: analysisData.players || [],
+    fraudAssessments: analysisData.fraudAssessments || [],
+    totalEventsProcessed: analysisData.totalEventsProcessed || 0,
   };
 }
 
