@@ -3,6 +3,7 @@
 ## ✅ What's been done:
 
 ### 1. **Go Binary Enhancement** (cs2json_final.go)
+
 - ✅ Properly extracts **map name** from game state
 - ✅ Extracts **team scores** correctly
 - ✅ Calculates **all player statistics** in real-time:
@@ -16,6 +17,7 @@
 - ✅ Detects game mode (5v5, wingman, deathmatch)
 
 ### 2. **Python Script Improvement** (parse_demo_final.py)
+
 - ✅ Uses **REAL** statistics from Go binary (no random values)
 - ✅ **Improved fraud probability calculation:**
   - Accuracy > 50% = high fraud risk
@@ -27,6 +29,7 @@
 - ✅ Categorizes risk levels (low/medium/high/critical)
 
 ### 3. **Match Details Page Redesign** (MatchDetails.tsx)
+
 - ✅ **7-tab interface** matching the design screenshot:
   1. **Overview** - Match result, team scores, team stats summary
   2. **Match Details** - Map, game mode, duration, player performance table
@@ -53,6 +56,7 @@
 ## 📋 What you need to do on the VPS:
 
 ### Step 1: Update Go Binary
+
 ```bash
 cd /path/to/cs2-analysis  # Your VPS project directory
 cp cs2json_final.go cs2json.go  # Replace the old file
@@ -60,12 +64,14 @@ go build -o scripts/cs2json cs2json.go
 ```
 
 ### Step 2: Update Python Script
+
 ```bash
 cp parse_demo_final.py scripts/parse_demo.py
 chmod +x scripts/parse_demo.py
 ```
 
 ### Step 3: Test the integration
+
 ```bash
 # Test with a demo file
 python3 scripts/parse_demo.py /path/to/test.dem
@@ -80,6 +86,7 @@ python3 scripts/parse_demo.py /path/to/test.dem
 ## 🔍 What data comes back now:
 
 The Python script returns JSON with this structure:
+
 ```json
 {
   "success": true,
@@ -137,6 +144,7 @@ The Python script returns JSON with this structure:
 ## 🎨 UI Changes Summary:
 
 ### New Tab Structure:
+
 - "Overview" - Match summary and team stats
 - "Match Details" - Full player stats table
 - "Head to Head" - Team comparison
@@ -146,6 +154,7 @@ The Python script returns JSON with this structure:
 - "Podejrzane klipy" ← **NEW** (Polish name for "Suspicious clips" - coming soon)
 
 ### Check Players Tab:
+
 - Left sidebar: Player list with kills
 - Right side: Selected player details
   - Header card with fraud risk percentage (color-coded)
@@ -157,6 +166,7 @@ The Python script returns JSON with this structure:
 ## 💾 Database Changes Needed:
 
 **None!** The current structure already supports all the data:
+
 - Players table stores kills, deaths, damage, accuracy, rating
 - Fraud assessments are already saved
 
@@ -171,12 +181,14 @@ The Python script returns JSON with this structure:
 ## ✨ Key Improvements:
 
 ### Before:
+
 - Map name always "Unknown"
 - Fraud probability always 5-15% (way too low)
 - Scores sometimes wrong
 - Random statistics generated
 
 ### After:
+
 - ✅ **Real** map names extracted from demo
 - ✅ **Accurate** team scores
 - ✅ **Realistic** fraud probabilities (0-100%)
@@ -189,20 +201,24 @@ The Python script returns JSON with this structure:
 ## 🔧 Troubleshooting:
 
 ### Map shows "Unknown"
+
 - Check if cs2json binary was recompiled
 - Demo file might not have valid map data
 
 ### Fraud scores still wrong
+
 - Ensure parse_demo_final.py is being used
 - Check Python script permissions: `chmod +x scripts/parse_demo.py`
 
 ### Scores = 0:0
+
 - Go binary needs to properly read team score from game state
 - Check if demo is corrupted
 
 ## 📞 Need Help?
 
 If something doesn't work:
+
 1. Check VPS logs: `/var/www/cs2-analysis/logs/parser.log`
 2. Test cs2json directly: `./scripts/cs2json /path/to/demo.dem`
 3. Check Python output: `python3 scripts/parse_demo.py /path/to/demo.dem`

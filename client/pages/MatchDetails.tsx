@@ -103,7 +103,9 @@ export default function MatchDetails() {
     return "DRAW";
   };
 
-  const selectedPlayerData = players.find((p: any) => p.name === selectedPlayer);
+  const selectedPlayerData = players.find(
+    (p: any) => p.name === selectedPlayer,
+  );
   const selectedPlayerFraud = fraudAssessments.find(
     (f: any) => f.playerName === selectedPlayer,
   );
@@ -219,83 +221,86 @@ export default function MatchDetails() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {[match.teamAName, match.teamBName].map((teamName: string) => {
-                      const teamData = teamStats[teamName];
-                      if (!teamData) return null;
+                    {[match.teamAName, match.teamBName].map(
+                      (teamName: string) => {
+                        const teamData = teamStats[teamName];
+                        if (!teamData) return null;
 
-                      return (
-                        <div
-                          key={teamName}
-                          className="bg-slate-800/50 rounded-lg p-4 space-y-3"
-                        >
-                          <p className="text-white font-bold text-lg">
-                            {teamName}
-                          </p>
-                          <div className="grid grid-cols-2 gap-3 text-sm">
-                            <div>
-                              <p className="text-slate-400 text-xs mb-1">
-                                Total Kills
-                              </p>
-                              <p className="text-white font-bold text-xl">
-                                {teamData.totalKills}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-slate-400 text-xs mb-1">
-                                Total Deaths
-                              </p>
-                              <p className="text-white font-bold text-xl">
-                                {teamData.totalDeaths}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-slate-400 text-xs mb-1">
-                                Total Damage
-                              </p>
-                              <p className="text-white font-bold text-xl">
-                                {teamData.totalDamage}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-slate-400 text-xs mb-1">
-                                Avg Rating
-                              </p>
-                              <p className="text-white font-bold text-xl">
-                                {teamData.avgRating}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-slate-400 text-xs mb-1">
-                                Avg Accuracy
-                              </p>
-                              <p className="text-white font-bold text-xl">
-                                {(parseFloat(teamData.avgAccuracy) * 100).toFixed(
-                                  1,
-                                )}
-                                %
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-slate-400 text-xs mb-1">
-                                Fraud Risk
-                              </p>
-                              <p
-                                className={`font-bold text-xl ${
-                                  parseFloat(teamData.avgFraudProbability) > 50
-                                    ? "text-red-400"
-                                    : "text-green-400"
-                                }`}
-                              >
-                                {parseFloat(teamData.avgFraudProbability).toFixed(
-                                  1,
-                                )}
-                                %
-                              </p>
+                        return (
+                          <div
+                            key={teamName}
+                            className="bg-slate-800/50 rounded-lg p-4 space-y-3"
+                          >
+                            <p className="text-white font-bold text-lg">
+                              {teamName}
+                            </p>
+                            <div className="grid grid-cols-2 gap-3 text-sm">
+                              <div>
+                                <p className="text-slate-400 text-xs mb-1">
+                                  Total Kills
+                                </p>
+                                <p className="text-white font-bold text-xl">
+                                  {teamData.totalKills}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-slate-400 text-xs mb-1">
+                                  Total Deaths
+                                </p>
+                                <p className="text-white font-bold text-xl">
+                                  {teamData.totalDeaths}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-slate-400 text-xs mb-1">
+                                  Total Damage
+                                </p>
+                                <p className="text-white font-bold text-xl">
+                                  {teamData.totalDamage}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-slate-400 text-xs mb-1">
+                                  Avg Rating
+                                </p>
+                                <p className="text-white font-bold text-xl">
+                                  {teamData.avgRating}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-slate-400 text-xs mb-1">
+                                  Avg Accuracy
+                                </p>
+                                <p className="text-white font-bold text-xl">
+                                  {(
+                                    parseFloat(teamData.avgAccuracy) * 100
+                                  ).toFixed(1)}
+                                  %
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-slate-400 text-xs mb-1">
+                                  Fraud Risk
+                                </p>
+                                <p
+                                  className={`font-bold text-xl ${
+                                    parseFloat(teamData.avgFraudProbability) >
+                                    50
+                                      ? "text-red-400"
+                                      : "text-green-400"
+                                  }`}
+                                >
+                                  {parseFloat(
+                                    teamData.avgFraudProbability,
+                                  ).toFixed(1)}
+                                  %
+                                </p>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      },
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -312,18 +317,21 @@ export default function MatchDetails() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                   <div className="bg-slate-800/50 rounded-lg p-4">
                     <p className="text-slate-400 text-sm mb-2">Map</p>
-                    <p className="text-white font-bold text-lg">{match.mapName}</p>
+                    <p className="text-white font-bold text-lg">
+                      {match.mapName}
+                    </p>
                   </div>
                   <div className="bg-slate-800/50 rounded-lg p-4">
                     <p className="text-slate-400 text-sm mb-2">Game Mode</p>
-                    <p className="text-white font-bold text-lg">{match.gameMode.toUpperCase()}</p>
+                    <p className="text-white font-bold text-lg">
+                      {match.gameMode.toUpperCase()}
+                    </p>
                   </div>
                   <div className="bg-slate-800/50 rounded-lg p-4">
                     <p className="text-slate-400 text-sm mb-2">Duration</p>
                     <p className="text-white font-bold text-lg">
-                      {Math.floor(match.duration / 60)}:{(match.duration % 60)
-                        .toString()
-                        .padStart(2, "0")}
+                      {Math.floor(match.duration / 60)}:
+                      {(match.duration % 60).toString().padStart(2, "0")}
                     </p>
                   </div>
                 </div>
@@ -477,14 +485,18 @@ export default function MatchDetails() {
                               Avg Accuracy
                             </td>
                             <td className="py-3 px-4 text-center text-white">
-                              {(parseFloat(teamStats[match.teamAName]?.avgAccuracy) *
-                                100
+                              {(
+                                parseFloat(
+                                  teamStats[match.teamAName]?.avgAccuracy,
+                                ) * 100
                               ).toFixed(1)}
                               %
                             </td>
                             <td className="py-3 px-4 text-center text-white">
-                              {(parseFloat(teamStats[match.teamBName]?.avgAccuracy) *
-                                100
+                              {(
+                                parseFloat(
+                                  teamStats[match.teamBName]?.avgAccuracy,
+                                ) * 100
                               ).toFixed(1)}
                               %
                             </td>
@@ -581,7 +593,9 @@ export default function MatchDetails() {
               <CardContent className="py-12 text-center">
                 <div className="text-slate-400">
                   <p className="text-lg font-medium mb-2">Map Zones Analysis</p>
-                  <p className="text-sm">Coming soon - Heat map data will be displayed here</p>
+                  <p className="text-sm">
+                    Coming soon - Heat map data will be displayed here
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -654,9 +668,7 @@ export default function MatchDetails() {
 
                         <div className="grid grid-cols-4 gap-4">
                           <div>
-                            <p className="text-slate-400 text-xs mb-1">
-                              Kills
-                            </p>
+                            <p className="text-slate-400 text-xs mb-1">Kills</p>
                             <p className="text-white font-bold text-xl">
                               {selectedPlayerData.kills}
                             </p>
@@ -676,9 +688,7 @@ export default function MatchDetails() {
                             </p>
                           </div>
                           <div>
-                            <p className="text-slate-400 text-xs mb-1">
-                              HS%
-                            </p>
+                            <p className="text-slate-400 text-xs mb-1">HS%</p>
                             <p className="text-white font-bold text-xl">
                               {selectedPlayerData.hsPercent.toFixed(1)}%
                             </p>
@@ -790,7 +800,8 @@ export default function MatchDetails() {
                           </div>
                         </div>
 
-                        {selectedPlayerFraud.suspiciousActivities?.length > 0 && (
+                        {selectedPlayerFraud.suspiciousActivities?.length >
+                          0 && (
                           <div className="space-y-2 mt-4 pt-4 border-t border-slate-700">
                             <p className="text-white font-medium text-sm">
                               Suspicious Indicators:
@@ -805,7 +816,8 @@ export default function MatchDetails() {
                                     {activity.description}
                                   </p>
                                   <p className="text-red-400 text-xs">
-                                    Confidence: {activity.confidence.toFixed(1)}%
+                                    Confidence: {activity.confidence.toFixed(1)}
+                                    %
                                   </p>
                                 </div>
                               ),
@@ -824,7 +836,8 @@ export default function MatchDetails() {
                                   : "bg-green-500/20 text-green-300 border border-green-500"
                           }`}
                         >
-                          Risk Level: {selectedPlayerFraud.riskLevel.toUpperCase()}
+                          Risk Level:{" "}
+                          {selectedPlayerFraud.riskLevel.toUpperCase()}
                         </div>
                       </CardContent>
                     </Card>

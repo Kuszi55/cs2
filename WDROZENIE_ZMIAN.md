@@ -3,7 +3,9 @@
 ## Co się zmieniło:
 
 ### ✅ **Frontend (React)** - GOTOWE
+
 Nowa strona z meczu z 7 zakładkami:
+
 1. **Overview** - Wynik meczu, statystyki drużyn
 2. **Details** - Dane meczu i statystyki graczy
 3. **H2H** - Porównanie drużyn
@@ -13,6 +15,7 @@ Nowa strona z meczu z 7 zakładkami:
 7. **Podejrzane klipy** ✨ **NOWE** - Placeholder (wkrótce)
 
 ### ✅ **Funkcja "Check Players"** - GOTOWA
+
 - Lista graczy do wyboru
 - Szczegółowe dane gracza (K/D, HS%, dokładność, etc)
 - Ocena oszustwa z podziałem na:
@@ -45,6 +48,7 @@ go build -o scripts/cs2json cs2json.go
 ```
 
 **Czego to naprawia:**
+
 - ✅ Mapę zawsze wyświetla prawidłową (nie "UNKNOWN")
 - ✅ Wyniki drużyn teraz się biorą z rzeczywistych danych dema
 - ✅ Wszystkie statystyki graczy są teraz **RZECZYWISTE**
@@ -65,6 +69,7 @@ python3 scripts/parse_demo.py /path/to/demo.dem
 ```
 
 **Czego to naprawia:**
+
 - ✅ Fraud probability teraz rzeczywiste (0-100%, nie zawsze niskie)
 - ✅ Wszystkie statystyki biorą się z Go binary (nie random)
 - ✅ Lepszy algorytm obliczania oszustwa:
@@ -80,6 +85,7 @@ python3 scripts/parse_demo.py /path/to/demo.dem
 Po wdrożeniu zmian, wgraj demo plikiem w aplikacji i sprawdź:
 
 ### Sprawdzenia:
+
 1. ✅ Mapa się wyświetla prawidłowo (nie "UNKNOWN")
 2. ✅ Wyniki są prawidłowe (nie 0:0 lub losowe)
 3. ✅ Statystyki graczy są rzeczywiste
@@ -139,10 +145,12 @@ Teraz zwraca format:
 ## 🎨 Zmiany w UI
 
 ### Stary design:
+
 - Tabela z graczami
 - Podstawowe statystyki
 
 ### Nowy design:
+
 - ✨ 7 zakładek
 - ✨ "Check Players" z wyborze gracza
 - ✨ Detailowe karty oszustwa
@@ -155,15 +163,19 @@ Teraz zwraca format:
 ## ❓ Problemy?
 
 ### Mapa zawsze "Unknown"
+
 → Sprawdź czy Go binary się przecompilował poprawnie
 
 ### Fraud Score zawsze niski/wysoki
+
 → Upewnij się że używasz `parse_demo_final.py`
 
 ### Błędy w logach
+
 → Sprawdź `/var/www/cs2-analysis/logs/parser.log`
 
 ### Test bezpośrednio:
+
 ```bash
 python3 scripts/parse_demo.py test.dem | python3 -m json.tool
 ```
@@ -172,13 +184,13 @@ python3 scripts/parse_demo.py test.dem | python3 -m json.tool
 
 ## ✨ Podsumowanie
 
-| Przed | Po |
-|-------|-----|
-| Mapa = "Unknown" | ✅ Rzeczywista mapa |
-| Wyniki losowe | ✅ Prawidłowe wyniki |
-| Fraud = 5-15% | ✅ Realistyczne 0-100% |
+| Przed               | Po                           |
+| ------------------- | ---------------------------- |
+| Mapa = "Unknown"    | ✅ Rzeczywista mapa          |
+| Wyniki losowe       | ✅ Prawidłowe wyniki         |
+| Fraud = 5-15%       | ✅ Realistyczne 0-100%       |
 | Brak nowych funkcji | ✅ 7 zakładek + Player Check |
-| - | ✅ Polski UI |
+| -                   | ✅ Polski UI                 |
 
 ---
 
