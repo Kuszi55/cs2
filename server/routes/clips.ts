@@ -46,7 +46,7 @@ router.get("/:matchId", (req: Request, res: Response) => {
           filename: file,
           path: `/clips/${matchId}/${file}`,
           size: stats.size,
-          sizeGB: (stats.size / 1024 / 1024 / 1024).toFixed(2),
+          sizeMB: (stats.size / 1024 / 1024).toFixed(2),
           createdAt: stats.mtime,
         };
       });
@@ -179,7 +179,7 @@ router.post("/:matchId/generate", async (req: Request, res: Response) => {
       }
 
       console.log(
-        `✅ Generated ${result.clips_generated} clips for match ${matchId}`,
+        `✅ Generated ${result.clips_generated} clips for match ${matchId}`
       );
 
       res.json({
