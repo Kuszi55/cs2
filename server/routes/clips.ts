@@ -178,7 +178,9 @@ router.post("/:matchId/generate", async (req: Request, res: Response) => {
         });
       }
 
-      console.log(`✅ Generated ${result.clips_generated} clips for match ${matchId}`);
+      console.log(
+        `✅ Generated ${result.clips_generated} clips for match ${matchId}`,
+      );
 
       res.json({
         success: true,

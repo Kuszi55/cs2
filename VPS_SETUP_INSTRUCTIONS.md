@@ -113,6 +113,7 @@ Create file: `/var/www/cs2-analysis/scripts/generate_clips.py`
 ## KROK 7: Database Connection
 
 Ensure your `.env` or config has:
+
 ```
 DATABASE_URL=mysql://user:password@localhost:3306/cs2analysis
 NODE_ENV=production
@@ -196,17 +197,20 @@ mysql -u your_user -p your_database -e "SHOW TABLES LIKE 'suspicious%';"
 ## 🔧 Troubleshooting
 
 **ffmpeg errors:**
+
 ```bash
 ffmpeg -version
 apt-get install ffmpeg
 ```
 
 **Python errors:**
+
 ```bash
 pip3 install opencv-python pillow numpy scipy
 ```
 
 **Database errors:**
+
 ```bash
 mysql -u root -p
 USE cs2analysis;
@@ -214,6 +218,7 @@ SHOW TABLES;
 ```
 
 **Folder permissions:**
+
 ```bash
 chmod 755 /var/www/cs2-analysis/clips
 chmod +x /var/www/cs2-analysis/clips

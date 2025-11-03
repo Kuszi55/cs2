@@ -114,7 +114,7 @@ Files to create/update:
    - Add Clips tab with generation modal
    - Update other tabs with charts
 
-2. **Create `client/pages/Settings.tsx`** 
+2. **Create `client/pages/Settings.tsx`**
    - Add admin panel for ADMIN2137
    - Match management
    - Clip management
@@ -189,6 +189,7 @@ The Go binary detects:
 9. **unusual_positioning** - Unnatural player positioning
 
 Sensitivity levels (1-5):
+
 - **1**: Only obvious moments (confidence > 90%)
 - **2**: Clear moments (confidence > 85%)
 - **3**: Normal mix (confidence > 80%)
@@ -236,21 +237,22 @@ Settings page should show:
 
 ## 🔑 API ENDPOINTS
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/clips/:matchId/generate` | Generate clips |
-| GET | `/api/clips/:matchId` | List clips for match |
-| GET | `/api/clips/:matchId/:clipId/download` | Download clip |
-| DELETE | `/api/clips/:matchId/:clipId` | Delete single clip |
-| DELETE | `/api/clips/:matchId` | Delete all clips for match |
-| GET | `/api/admin/matches` | List all matches (admin) |
-| DELETE | `/api/admin/matches/:matchId` | Delete match + clips (admin) |
+| Method | Endpoint                               | Description                  |
+| ------ | -------------------------------------- | ---------------------------- |
+| POST   | `/api/clips/:matchId/generate`         | Generate clips               |
+| GET    | `/api/clips/:matchId`                  | List clips for match         |
+| GET    | `/api/clips/:matchId/:clipId/download` | Download clip                |
+| DELETE | `/api/clips/:matchId/:clipId`          | Delete single clip           |
+| DELETE | `/api/clips/:matchId`                  | Delete all clips for match   |
+| GET    | `/api/admin/matches`                   | List all matches (admin)     |
+| DELETE | `/api/admin/matches/:matchId`          | Delete match + clips (admin) |
 
 ---
 
 ## 📝 FRONTEND COMPONENTS NEEDED
 
 ### ClipGeneratorModal.tsx
+
 ```typescript
 interface ClipGeneratorModalProps {
   matchId: number;
@@ -267,6 +269,7 @@ interface ClipGeneratorModalProps {
 ```
 
 ### VideoPlayer.tsx
+
 ```typescript
 interface VideoPlayerProps {
   src: string;
@@ -286,6 +289,7 @@ interface VideoPlayerProps {
 ```
 
 ### AdminMatchesTable.tsx
+
 ```typescript
 // Features:
 // - Sortable columns
@@ -322,6 +326,7 @@ interface VideoPlayerProps {
 ## 🔧 TROUBLESHOOTING
 
 **Go binary won't compile:**
+
 ```bash
 # Check Go version
 go version
@@ -332,6 +337,7 @@ go build -o scripts/cs2json cs2json_with_detection.go
 ```
 
 **Python script fails:**
+
 ```bash
 # Check Python packages
 pip3 list | grep -E "opencv|pillow|numpy|scipy"
@@ -341,6 +347,7 @@ python3 scripts/generate_clips.py /path/to/demo.dem /var/www/cs2-analysis/clips 
 ```
 
 **ffmpeg errors:**
+
 ```bash
 # Install ffmpeg
 apt-get update
@@ -351,6 +358,7 @@ ffmpeg -version
 ```
 
 **Permissions errors:**
+
 ```bash
 # Fix folder permissions
 chmod 755 /var/www/cs2-analysis/clips
@@ -358,6 +366,7 @@ chmod +x /var/www/cs2-analysis/scripts/generate_clips.py
 ```
 
 **Database errors:**
+
 ```bash
 # Verify connection
 mysql -u user -p database -e "SHOW TABLES;"
