@@ -88,7 +88,7 @@ export function RatingBreakdownChart({
             <tr className="border-b border-slate-700">
               <td className="py-3 px-4 text-white font-medium">Aim</td>
               <td
-                className={`py-3 px-4 text-center font-bold ${metricAA > metricB ? "text-green-400" : "text-slate-300"}`}
+                className={`py-3 px-4 text-center font-bold ${metricA.aim > metricB.aim ? "text-green-400" : "text-slate-300"}`}
               >
                 {metricA.aim.toFixed(1)}
               </td>
