@@ -72,7 +72,9 @@ export function ClipGeneratorModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="border-slate-700 bg-slate-900">
         <DialogHeader>
-          <DialogTitle className="text-white">Generuj Podejrzane Klipy</DialogTitle>
+          <DialogTitle className="text-white">
+            Generuj Podejrzane Klipy
+          </DialogTitle>
           <DialogDescription className="text-slate-400">
             Wygeneruj do {maxClips} 1080p 60fps klipów z podejrzanymi momentami
           </DialogDescription>
@@ -124,8 +126,8 @@ export function ClipGeneratorModal({
           {/* Info Box */}
           <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
             <p className="text-sm text-blue-300">
-              <span className="font-medium">Info:</span> Każdy klip ma ~1-20 sekund,
-              jakość 1080p 60fps. Generowanie może trwać kilka minut.
+              <span className="font-medium">Info:</span> Każdy klip ma ~1-20
+              sekund, jakość 1080p 60fps. Generowanie może trwać kilka minut.
             </p>
           </div>
 

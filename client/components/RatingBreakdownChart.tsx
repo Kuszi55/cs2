@@ -45,7 +45,13 @@ export function RatingBreakdownChart({
 
   const metricsA = getSampleMetrics(teamAName);
   const metricsB = getSampleMetrics(teamBName);
-  const metrics = ["Aim", "Positioning", "Reaction", "Game Sense", "Consistency"];
+  const metrics = [
+    "Aim",
+    "Positioning",
+    "Reaction",
+    "Game Sense",
+    "Consistency",
+  ];
 
   return (
     <div className="space-y-6">
@@ -188,9 +194,7 @@ export function RatingBreakdownChart({
                   <div className="w-full bg-slate-800 rounded-full h-2">
                     <div
                       className={`h-2 rounded-full transition-all ${
-                        team === teamAName
-                          ? "bg-blue-500"
-                          : "bg-red-500"
+                        team === teamAName ? "bg-blue-500" : "bg-red-500"
                       }`}
                       style={{ width: `${Math.min(value, 100)}%` }}
                     />

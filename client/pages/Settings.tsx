@@ -69,7 +69,9 @@ export default function Settings() {
   };
 
   const handleDeleteMatch = async (matchId: string) => {
-    if (!confirm("Are you sure? This will delete the match and all its clips.")) {
+    if (
+      !confirm("Are you sure? This will delete the match and all its clips.")
+    ) {
       return;
     }
 

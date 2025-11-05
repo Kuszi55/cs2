@@ -178,7 +178,9 @@ export function VideoPlayer({
           className={`p-4 rounded-lg border ${getSuspicionColor(moment.suspicionType)}`}
         >
           <div className="flex justify-between items-start mb-2">
-            <h4 className="font-bold">{moment.playerName || "Unknown Player"}</h4>
+            <h4 className="font-bold">
+              {moment.playerName || "Unknown Player"}
+            </h4>
             {moment.confidence && (
               <span className="text-sm">
                 Confidence: {moment.confidence.toFixed(1)}%
@@ -186,9 +188,8 @@ export function VideoPlayer({
             )}
           </div>
           <p className="text-sm opacity-90">
-            {moment.suspicionType
-              ?.replace(/_/g, " ")
-              .toUpperCase() || "Suspicious Moment"}
+            {moment.suspicionType?.replace(/_/g, " ").toUpperCase() ||
+              "Suspicious Moment"}
           </p>
           {moment.description && (
             <p className="text-xs opacity-75 mt-1">{moment.description}</p>

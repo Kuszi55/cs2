@@ -34,8 +34,12 @@ export default function MatchDetails() {
   const [clips, setClips] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-  const [selectedPlayerLeft, setSelectedPlayerLeft] = useState<string | null>(null);
-  const [selectedPlayerRight, setSelectedPlayerRight] = useState<string | null>(null);
+  const [selectedPlayerLeft, setSelectedPlayerLeft] = useState<string | null>(
+    null,
+  );
+  const [selectedPlayerRight, setSelectedPlayerRight] = useState<string | null>(
+    null,
+  );
   const [selectedClip, setSelectedClip] = useState<any>(null);
   const [isGeneratingClips, setIsGeneratingClips] = useState(false);
   const [showClipGenerator, setShowClipGenerator] = useState(false);
@@ -586,7 +590,8 @@ export default function MatchDetails() {
                           <td
                             className={`py-3 px-4 text-center font-bold ${getStatComparisonClass(selectedPlayerLeftData.kdRatio, selectedPlayerRightData.kdRatio)}`}
                           >
-                            {selectedPlayerLeftData.kdRatio?.toFixed(2) || "0.00"}
+                            {selectedPlayerLeftData.kdRatio?.toFixed(2) ||
+                              "0.00"}
                           </td>
                           <td className="py-3 px-4 text-center text-slate-500">
                             —
@@ -594,7 +599,8 @@ export default function MatchDetails() {
                           <td
                             className={`py-3 px-4 text-center font-bold ${getStatComparisonClass(selectedPlayerRightData.kdRatio, selectedPlayerLeftData.kdRatio)}`}
                           >
-                            {selectedPlayerRightData.kdRatio?.toFixed(2) || "0.00"}
+                            {selectedPlayerRightData.kdRatio?.toFixed(2) ||
+                              "0.00"}
                           </td>
                         </tr>
                         <tr className="border-b border-slate-700">
@@ -622,7 +628,9 @@ export default function MatchDetails() {
                           <td
                             className={`py-3 px-4 text-center font-bold ${getStatComparisonClass(selectedPlayerLeftData.hsPercent || 0, selectedPlayerRightData.hsPercent || 0)}`}
                           >
-                            {selectedPlayerLeftData.hsPercent?.toFixed(1) || "0.0"}%
+                            {selectedPlayerLeftData.hsPercent?.toFixed(1) ||
+                              "0.0"}
+                            %
                           </td>
                           <td className="py-3 px-4 text-center text-slate-500">
                             —
@@ -630,7 +638,9 @@ export default function MatchDetails() {
                           <td
                             className={`py-3 px-4 text-center font-bold ${getStatComparisonClass(selectedPlayerRightData.hsPercent || 0, selectedPlayerLeftData.hsPercent || 0)}`}
                           >
-                            {selectedPlayerRightData.hsPercent?.toFixed(1) || "0.0"}%
+                            {selectedPlayerRightData.hsPercent?.toFixed(1) ||
+                              "0.0"}
+                            %
                           </td>
                         </tr>
                         <tr className="border-b border-slate-700">
@@ -664,7 +674,8 @@ export default function MatchDetails() {
                           <td
                             className={`py-3 px-4 text-center font-bold ${getStatComparisonClass(selectedPlayerLeftData.rating || 0, selectedPlayerRightData.rating || 0)}`}
                           >
-                            {selectedPlayerLeftData.rating?.toFixed(2) || "0.00"}
+                            {selectedPlayerLeftData.rating?.toFixed(2) ||
+                              "0.00"}
                           </td>
                           <td className="py-3 px-4 text-center text-slate-500">
                             —
@@ -672,7 +683,8 @@ export default function MatchDetails() {
                           <td
                             className={`py-3 px-4 text-center font-bold ${getStatComparisonClass(selectedPlayerRightData.rating || 0, selectedPlayerLeftData.rating || 0)}`}
                           >
-                            {selectedPlayerRightData.rating?.toFixed(2) || "0.00"}
+                            {selectedPlayerRightData.rating?.toFixed(2) ||
+                              "0.00"}
                           </td>
                         </tr>
                       </tbody>
@@ -752,7 +764,7 @@ export default function MatchDetails() {
                                   .fraudProbability > 70
                                   ? "bg-red-500/20 border border-red-500"
                                   : selectedPlayerLeftData.fraudAssessment
-                                      .fraudProbability > 40
+                                        .fraudProbability > 40
                                     ? "bg-yellow-500/20 border border-yellow-500"
                                     : "bg-green-500/20 border border-green-500"
                               }`}
@@ -766,7 +778,7 @@ export default function MatchDetails() {
                                     .fraudProbability > 70
                                     ? "text-red-400"
                                     : selectedPlayerLeftData.fraudAssessment
-                                        .fraudProbability > 40
+                                          .fraudProbability > 40
                                       ? "text-yellow-400"
                                       : "text-green-400"
                                 }`}
@@ -788,7 +800,9 @@ export default function MatchDetails() {
                             </p>
                           </div>
                           <div>
-                            <p className="text-slate-400 text-xs mb-1">Deaths</p>
+                            <p className="text-slate-400 text-xs mb-1">
+                              Deaths
+                            </p>
                             <p className="text-white font-bold text-xl">
                               {selectedPlayerLeftData.deaths}
                             </p>
@@ -796,13 +810,16 @@ export default function MatchDetails() {
                           <div>
                             <p className="text-slate-400 text-xs mb-1">K/D</p>
                             <p className="text-white font-bold text-xl">
-                              {selectedPlayerLeftData.kdRatio?.toFixed(2) || "0.00"}
+                              {selectedPlayerLeftData.kdRatio?.toFixed(2) ||
+                                "0.00"}
                             </p>
                           </div>
                           <div>
                             <p className="text-slate-400 text-xs mb-1">HS%</p>
                             <p className="text-white font-bold text-xl">
-                              {selectedPlayerLeftData.hsPercent?.toFixed(1) || "0.0"}%
+                              {selectedPlayerLeftData.hsPercent?.toFixed(1) ||
+                                "0.0"}
+                              %
                             </p>
                           </div>
                         </div>
@@ -833,7 +850,8 @@ export default function MatchDetails() {
                               Rating
                             </p>
                             <p className="text-white font-bold">
-                              {selectedPlayerLeftData.rating?.toFixed(2) || "0.00"}
+                              {selectedPlayerLeftData.rating?.toFixed(2) ||
+                                "0.00"}
                             </p>
                           </div>
                           <div className="bg-slate-800/50 rounded-lg p-3">
@@ -942,7 +960,9 @@ export default function MatchDetails() {
                                       </p>
                                       <p className="text-red-400 text-xs">
                                         Confidence:{" "}
-                                        {activity.confidence?.toFixed(1) || "0.0"}%
+                                        {activity.confidence?.toFixed(1) ||
+                                          "0.0"}
+                                        %
                                       </p>
                                     </div>
                                   ),
@@ -952,14 +972,14 @@ export default function MatchDetails() {
 
                             <div
                               className={`mt-4 p-3 rounded-lg text-sm font-medium ${
-                                selectedPlayerLeftData.fraudAssessment.riskLevel ===
-                                "critical"
+                                selectedPlayerLeftData.fraudAssessment
+                                  .riskLevel === "critical"
                                   ? "bg-red-500/20 text-red-300 border border-red-500"
                                   : selectedPlayerLeftData.fraudAssessment
-                                      .riskLevel === "high"
+                                        .riskLevel === "high"
                                     ? "bg-orange-500/20 text-orange-300 border border-orange-500"
                                     : selectedPlayerLeftData.fraudAssessment
-                                        .riskLevel === "medium"
+                                          .riskLevel === "medium"
                                       ? "bg-yellow-500/20 text-yellow-300 border border-yellow-500"
                                       : "bg-green-500/20 text-green-300 border border-green-500"
                               }`}
@@ -970,7 +990,9 @@ export default function MatchDetails() {
                             </div>
                           </>
                         ) : (
-                          <p className="text-slate-400">No fraud assessment available</p>
+                          <p className="text-slate-400">
+                            No fraud assessment available
+                          </p>
                         )}
                       </CardContent>
                     </Card>
