@@ -1,5 +1,4 @@
 import React from "react";
-import { Chart } from "react-apexcharts";
 
 interface RatingChartProps {
   players: any[];
@@ -14,72 +13,6 @@ export function RatingBreakdownChart({
 }: RatingChartProps) {
   const teamAPlayers = players.filter((p) => p.team === teamAName);
   const teamBPlayers = players.filter((p) => p.team === teamBName);
-
-  const chartOptions = {
-    chart: {
-      type: "radar" as const,
-      toolbar: { show: false },
-      sparkline: { enabled: false },
-    },
-    stroke: {
-      show: true,
-      curve: "smooth" as const,
-      lineCap: "butt" as const,
-      colors: ["#3b82f6", "#ef4444"],
-      width: 2,
-      dashArray: 0,
-    },
-    fill: {
-      opacity: 0.15,
-    },
-    plotOptions: {
-      radar: {
-        size: 140,
-        polygons: {
-          strokeColors: "#4b5563",
-          fill: {
-            colors: ["#1e293b", "#334155"],
-          },
-        },
-      },
-    },
-    colors: ["#3b82f6", "#ef4444"],
-    xaxis: {
-      categories: ["Aim", "Position", "Reaction", "Game Sense", "Consistency"],
-      labels: {
-        show: true,
-        style: {
-          colors: "#94a3b8",
-          fontSize: "12px",
-        },
-      },
-    },
-    yaxis: {
-      show: true,
-      labels: {
-        style: {
-          colors: "#64748b",
-          fontSize: "11px",
-        },
-      },
-    },
-    legend: {
-      show: true,
-      floating: true,
-      fontSize: "14px",
-      position: "bottom" as const,
-      labels: {
-        colors: "#cbd5e1",
-      },
-    },
-    tooltip: {
-      enabled: true,
-      theme: "dark",
-      style: {
-        fontSize: "12px",
-      },
-    },
-  };
 
   const teamAAvgRating =
     teamAPlayers.reduce((sum, p) => sum + (p.rating || 0), 0) /
@@ -101,25 +34,18 @@ export function RatingBreakdownChart({
       teamPlayers.reduce((sum, p) => sum + (p.kdRatio || 0), 0) /
       teamPlayers.length;
 
-    return [
-      Math.min(avgAccuracy / 20, 100),
-      75 - avgHeadshot * 5,
-      80 + avgKD * 5,
-      Math.min(teamPlayers.length * 20, 100),
-      85 - Math.random() * 20,
-    ];
+    return {
+      aim: Math.min(avgAccuracy / 20, 100),
+      positioning: 75 - avgHeadshot * 5,
+      reaction: 80 + avgKD * 5,
+      gameSense: Math.min(teamPlayers.length * 20, 100),
+      consistency: 85 - Math.random() * 20,
+    };
   };
 
-  const seriesData = [
-    {
-      name: teamAName,
-      data: getSampleMetrics(teamAName),
-    },
-    {
-      name: teamBName,
-      data: getSampleMetrics(teamBName),
-    },
-  ];
+  const metricsA = getSampleMetrics(teamAName);
+  const metricsB = getSampleMetrics(teamBName);
+  const metrics = ["Aim", "Positioning", "Reaction", "Game Sense", "Consistency"];
 
   return (
     <div className="space-y-6">
@@ -140,15 +66,143 @@ export function RatingBreakdownChart({
         </div>
       </div>
 
+      {/* Metrics Comparison Table */}
       <div className="bg-slate-900/50 rounded-lg p-6 border border-slate-700 overflow-x-auto">
-        <Chart
-          options={chartOptions}
-          series={seriesData}
-          type="radar"
-          height={400}
-        />
+        <h3 className="text-white font-bold mb-4">Team Metrics Comparison</h3>
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-slate-700">
+              <th className="text-left py-3 px-4 text-slate-400 font-medium">
+                Metric
+              </th>
+              <th className="text-center py-3 px-4 text-blue-400 font-medium">
+                {teamAName}
+              </th>
+              <th className="text-center py-3 px-4 text-slate-500">vs</th>
+              <th className="text-center py-3 px-4 text-red-400 font-medium">
+                {teamBName}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="border-b border-slate-700">
+              <td className="py-3 px-4 text-white font-medium">Aim</td>
+              <td
+                className={`py-3 px-4 text-center font-bold ${metricAA > metricB ? "text-green-400" : "text-slate-300"}`}
+              >
+                {metricA.aim.toFixed(1)}
+              </td>
+              <td className="py-3 px-4 text-center text-slate-500">—</td>
+              <td
+                className={`py-3 px-4 text-center font-bold ${metricB.aim > metricA.aim ? "text-green-400" : "text-slate-300"}`}
+              >
+                {metricB.aim.toFixed(1)}
+              </td>
+            </tr>
+            <tr className="border-b border-slate-700">
+              <td className="py-3 px-4 text-white font-medium">Positioning</td>
+              <td
+                className={`py-3 px-4 text-center font-bold ${metricA.positioning > metricB.positioning ? "text-green-400" : "text-slate-300"}`}
+              >
+                {metricA.positioning.toFixed(1)}
+              </td>
+              <td className="py-3 px-4 text-center text-slate-500">—</td>
+              <td
+                className={`py-3 px-4 text-center font-bold ${metricB.positioning > metricA.positioning ? "text-green-400" : "text-slate-300"}`}
+              >
+                {metricB.positioning.toFixed(1)}
+              </td>
+            </tr>
+            <tr className="border-b border-slate-700">
+              <td className="py-3 px-4 text-white font-medium">Reaction</td>
+              <td
+                className={`py-3 px-4 text-center font-bold ${metricA.reaction > metricB.reaction ? "text-green-400" : "text-slate-300"}`}
+              >
+                {metricA.reaction.toFixed(1)}
+              </td>
+              <td className="py-3 px-4 text-center text-slate-500">—</td>
+              <td
+                className={`py-3 px-4 text-center font-bold ${metricB.reaction > metricA.reaction ? "text-green-400" : "text-slate-300"}`}
+              >
+                {metricB.reaction.toFixed(1)}
+              </td>
+            </tr>
+            <tr className="border-b border-slate-700">
+              <td className="py-3 px-4 text-white font-medium">Game Sense</td>
+              <td
+                className={`py-3 px-4 text-center font-bold ${metricA.gameSense > metricB.gameSense ? "text-green-400" : "text-slate-300"}`}
+              >
+                {metricA.gameSense.toFixed(1)}
+              </td>
+              <td className="py-3 px-4 text-center text-slate-500">—</td>
+              <td
+                className={`py-3 px-4 text-center font-bold ${metricB.gameSense > metricA.gameSense ? "text-green-400" : "text-slate-300"}`}
+              >
+                {metricB.gameSense.toFixed(1)}
+              </td>
+            </tr>
+            <tr>
+              <td className="py-3 px-4 text-white font-medium">Consistency</td>
+              <td
+                className={`py-3 px-4 text-center font-bold ${metricA.consistency > metricB.consistency ? "text-green-400" : "text-slate-300"}`}
+              >
+                {metricA.consistency.toFixed(1)}
+              </td>
+              <td className="py-3 px-4 text-center text-slate-500">—</td>
+              <td
+                className={`py-3 px-4 text-center font-bold ${metricB.consistency > metricA.consistency ? "text-green-400" : "text-slate-300"}`}
+              >
+                {metricB.consistency.toFixed(1)}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
+      {/* Visual Metric Bars */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {[
+          { team: teamAName, metrics: metricA },
+          { team: teamBName, metrics: metricB },
+        ].map(({ team, metrics }) => (
+          <div
+            key={team}
+            className="bg-slate-900/50 rounded-lg p-4 border border-slate-700"
+          >
+            <h4 className="text-white font-bold mb-4">{team}</h4>
+            <div className="space-y-3">
+              {[
+                { label: "Aim", value: metrics.aim },
+                { label: "Positioning", value: metrics.positioning },
+                { label: "Reaction", value: metrics.reaction },
+                { label: "Game Sense", value: metrics.gameSense },
+                { label: "Consistency", value: metrics.consistency },
+              ].map(({ label, value }) => (
+                <div key={label}>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-slate-300 text-sm">{label}</span>
+                    <span className="text-white font-bold text-sm">
+                      {value.toFixed(1)}
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-800 rounded-full h-2">
+                    <div
+                      className={`h-2 rounded-full transition-all ${
+                        team === teamAName
+                          ? "bg-blue-500"
+                          : "bg-red-500"
+                      }`}
+                      style={{ width: `${Math.min(value, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Top Players */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {[teamAName, teamBName].map((team) => {
           const teamPlayers = players.filter((p) => p.team === team);
@@ -157,7 +211,7 @@ export function RatingBreakdownChart({
               key={team}
               className="bg-slate-900/50 rounded-lg p-4 border border-slate-700"
             >
-              <h4 className="text-white font-bold mb-4">{team} - Player Ratings</h4>
+              <h4 className="text-white font-bold mb-4">{team} - Top Rated</h4>
               <div className="space-y-2">
                 {teamPlayers
                   .sort((a, b) => (b.rating || 0) - (a.rating || 0))
